@@ -1,0 +1,41 @@
+name: Build ARMv8
+
+on:
+  workflow_dispatch:
+  release:
+    types:
+      - released
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+            
+    steps:
+      - name: Free up space
+        run: |
+          pwd
+          df -h
+          sudo apt update
+          sudo apt autopurge -y apache2* bind9* clang* cpp* cryptsetup* dotnet* ~n^gcc-[0-9]+$ gfortran* gir* g++* google* imagemagick* lld* lldb* microsoft* moby* mono* mssql* mysql* nginx* php* postgresql* r-base* r-cran* rpm* ruby* temurin*
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /usr/local/share/boost
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          df -h
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Run build script
+        run: sudo ./build.sh
+      - name: Upload workflow artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          path: |
+            /tmp/*.apk
+      - name: Upload release assets
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: "/tmp/*.apk"
+          tag: ${{ github.ref }}
+          overwrite: true

@@ -25,10 +25,15 @@ export ANDROID_SDK_ROOT=${ANDROID_SDK}
 export ANDROID_SDK_HOME=${ANDROID_SDK}
 export ANDROID_NDK_ROOT=${ANDROID_NDK}
 export ANDROID_NDK_HOME=${ANDROID_NDK}
+export JAVA_HOME="/usr/lib/jvm/default-java"
+# export GRADLE_OPTS="-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.vfs.watch=true -Dorg.gradle.caching=true -Dorg.gradle.configureondemand=true"
+export GRADLE_OPTS="-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true"
+
+export CFLAGS="-pipe"
+export CXXFLAGS="${CFLAGS}"
 
 apt update
-apt install -y cmake make m4 g++ pkg-config libssl-dev python-is-python3 python3-distutils python3-venv tcl gyp ninja-build bzip2 libz-dev libffi-dev libsqlite3-dev
-apt install -y curl wget default-jdk-headless git mercurial-common sdkmanager zip unzip
+apt install -y cmake make m4 g++ pkg-config libssl-dev python-is-python3 python3-distutils python3-venv tcl gyp ninja-build bzip2 libz-dev libffi-dev libsqlite3-dev curl wget default-jdk-headless git mercurial-common sdkmanager zip unzip
 
 mkdir -p ${workdir}
 mkdir -p ${srclib}
@@ -88,7 +93,16 @@ git clone --depth=1 --branch ${Fenix_tag} https://github.com/mozilla-mobile/feni
 
 cd ${workdir}/fenix
 ${srclib}/MozBuild/prebuild.sh ${Fenix_version} ${Fenix_code}
+find ${srclib}/MozBuild -name .git -exec rm -rf {} \;
+find ${srclib}/MozAppServices -name .git -exec rm -rf {} \;
+find ${srclib}/MozFennec -name .hg -exec rm -rf {} \;
+find ${srclib}/MozGlean -name .git -exec rm -rf {} \;
+find ${srclib}/MozGleanAS -name .git -exec rm -rf {} \;
+find ${srclib}/rustup -name .git -exec rm -rf {} \;
+find ${srclib}/wasi-sdk -name .git -exec rm -rf {} \;
+# find ${workdir}/ -name gradle.properties -exec sed -i -e 's/org.gradle.parallel=false/org.gradle.parallel=true/g' {} \;
+find ${workdir}/ -name gradle.properties -exec sed -i -e 's/org.gradle.daemon=true/org.gradle.daemon=false/g' {} \;
 ${srclib}/MozBuild/build.sh
 
 gradle --stop
-mv ${workdir}/fenix/app/build/outputs/apk/release/*.apk ${workdir}/
+mv ${workdir}/fenix/app/build/outputs/apk/release/*.apk /tmp/
