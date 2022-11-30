@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-22.04
             
     steps:
-      - name: Free up space
+      - name: Remove unused packages
         run: |
           pwd
           df -h
@@ -21,7 +21,14 @@ jobs:
           sudo rm -rf /opt/ghc
           sudo rm -rf /usr/local/share/boost
           sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-          df -h
+      - name: Maximize build space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 4096
+          temp-reserve-mb: 100
+          remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
       - name: Checkout
         uses: actions/checkout@v3
       - name: Run build script

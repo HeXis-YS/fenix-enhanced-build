@@ -1,5 +1,6 @@
 #!/bin/bash
-workdir=${HOME}/build
+#workdir=${HOME}/build
+workdir=$(pwd)/build
 srclib=${workdir}/srclib
 ndk=r21d
 
