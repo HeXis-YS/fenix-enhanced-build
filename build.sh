@@ -28,8 +28,7 @@ export ANDROID_SDK_HOME=${ANDROID_SDK}
 export ANDROID_NDK_ROOT=${ANDROID_NDK}
 export ANDROID_NDK_HOME=${ANDROID_NDK}
 export JAVA_HOME="/usr/lib/jvm/default-java"
-# export GRADLE_OPTS="-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.vfs.watch=true -Dorg.gradle.caching=true -Dorg.gradle.configureondemand=true"
-export GRADLE_OPTS="-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true"
+export GRADLE_OPTS="-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.vfs.watch=true -Dorg.gradle.caching=true -Dorg.gradle.configureondemand=true -Xms1024m -Xmx2048m -Dorg.gradle.jvmargs='-Xms1024m -Xmx2048m -XX:MaxPermSize=512m'"
 
 export CFLAGS="-pipe"
 export CXXFLAGS="${CFLAGS}"
@@ -50,9 +49,9 @@ sdkmanager "ndk;${ndk}"
 sdkmanager "ndk;21.3.6528147"
 sdkmanager "platform-tools"
 
-# FireFoxAndroid
-git clone https://github.com/mozilla-mobile/firefox-android.git ${srclib}/FireFoxAndroid
-pushd ${srclib}/FireFoxAndroid
+# FirefoxAndroid
+git clone --depth=1 --branch ${FirefoxAndroid_tag} https://github.com/mozilla-mobile/firefox-android.git ${srclib}/FirefoxAndroid
+pushd ${srclib}/FirefoxAndroid
 sed -i -e '/com.google.firebase/d' android-components/buildSrc/src/main/java/Dependencies.kt
 rm -fR android-components/components/lib/push-firebase
 popd
@@ -110,6 +109,7 @@ git clone --depth=1 --branch ${Fenix_tag} https://github.com/mozilla-mobile/feni
 
 cd ${workdir}/fenix
 ${srclib}/MozBuild/prebuild.sh ${Fenix_version} ${Fenix_code}
+find ${srclib}/FirefoxAndroid -name .git -exec rm -rf {} \;
 find ${srclib}/MozBuild -name .git -exec rm -rf {} \;
 find ${srclib}/MozAppServices -name .git -exec rm -rf {} \;
 find ${srclib}/MozFennec -name .hg -exec rm -rf {} \;
@@ -117,8 +117,15 @@ find ${srclib}/MozGlean -name .git -exec rm -rf {} \;
 find ${srclib}/MozGleanAS -name .git -exec rm -rf {} \;
 find ${srclib}/rustup -name .git -exec rm -rf {} \;
 find ${srclib}/wasi-sdk -name .git -exec rm -rf {} \;
-# find ${workdir}/ -name gradle.properties -exec sed -i -e 's/org.gradle.parallel=false/org.gradle.parallel=true/g' {} \;
-find ${workdir}/ -name gradle.properties -exec sed -i -e 's/org.gradle.daemon=true/org.gradle.daemon=false/g' {} \;
+find ${workdir}/ -name gradle.properties -exec sed -i  \
+                                                   -e 's/org.gradle.daemon=true/org.gradle.daemon=false/g' \
+                                                   -e 's/org.gradle.parallel=false/org.gradle.parallel=true/g' \
+                                                   -e 's/org.gradle.vfs.watch=false/org.gradle.vfs.watch=true/g' \
+                                                   -e 's/org.gradle.caching=false/org.gradle.caching=true/g' \
+                                                   -e 's/org.gradle.configureondemand=false/org.gradle.configureondemand=true/g' \
+                                                   -e 's/-Xmx[0-9]*m/-Xmx2048m/g' \
+                                                   -e 's/-Xms[0-9]*m/-Xms1024m/g' \
+                                                   {} \;
 ${srclib}/MozBuild/build.sh
 
 gradle --stop
