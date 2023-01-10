@@ -4,17 +4,17 @@ workdir=$(pwd)/build
 srclib=${workdir}/srclib
 ndk=r21d
 
-Fenix_tag=v107.1.0
-Fenix_version=107.1.0
-Fenix_code=171020
+Fenix_tag=v108.1.1
+Fenix_version=v108.1.1
+Fenix_code=1081120
 
-FirefoxAndroid_tag=v107.0.7
+FirefoxAndroid_tag=v108.1.1
 # MozAndroidComponents_tag=v106.0.5
-MozAndroidComponentsAS_tag=v104.0.2
-MozAppServices_tag=v94.2.2
-MozBuild_commit=4c988523b5c24f399150f84d0f681fbbd6502999
-MozFennec_tag=FIREFOX_107_0_RELEASE
-MozGlean_tag=v51.4.0
+MozAndroidComponentsAS_tag=v107.0.2
+MozAppServices_tag=v95.0.1
+MozBuild_commit=10e85e62977229eeaebf1da5a16d47af670e5822
+MozFennec_tag=FIREFOX_108_0_1_RELEASE
+MozGlean_tag=v51.8.2
 MozGleanAS_tag=51.2.0
 rustup_tag=1.25.1
 wasisdk_tag=wasi-sdk-16
