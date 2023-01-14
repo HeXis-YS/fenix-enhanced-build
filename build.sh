@@ -8,9 +8,13 @@ fi
 srclib=${workdir}/srclib
 ndk=r21d
 
+if [ -z "${arch_code}" ]
+then
+    arch_code=0
+fi
 Fenix_tag=v108.1.1
 Fenix_version=108.1.1
-Fenix_code=1081120
+Fenix_code=10811${arch_code}0
 
 FirefoxAndroid_tag=v108.1.1
 MozAndroidComponentsAS_tag=v107.0.2

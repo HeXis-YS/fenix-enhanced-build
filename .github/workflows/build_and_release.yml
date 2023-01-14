@@ -1,4 +1,4 @@
-name: Build ARMv8
+name: Build and release
 
 on:
   workflow_dispatch:
@@ -9,7 +9,17 @@ on:
 jobs:
   build:
     runs-on: ubuntu-22.04
-            
+    strategy:
+      matrix:
+        include:
+          - arch_name: armeabi-v7a
+            arch_code: 0
+          - arch_name: x86
+            arch_code: 1
+          - arch_name: arm64-v8a
+            arch_code: 2
+    env:
+      arch_code: ${{ matrix.arch_code }}
     steps:
       - name: Remove unused packages
         run: |
@@ -38,6 +48,7 @@ jobs:
       - name: Upload workflow artifacts
         uses: actions/upload-artifact@v3
         with:
+          name: ${{ matrix.arch_name }}
           path: |
             /tmp/*.apk
       - name: Upload release assets
