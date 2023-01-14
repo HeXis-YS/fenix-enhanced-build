@@ -1,6 +1,10 @@
 #!/bin/bash
-# workdir=${HOME}/build
-workdir=$(pwd)/build
+if [ -z "${GITHUB_WORKSPACE}" ]
+then
+    workdir=$(pwd)/build
+else
+    workdir=${GITHUB_WORKSPACE}/build
+fi
 srclib=${workdir}/srclib
 ndk=r21d
 
