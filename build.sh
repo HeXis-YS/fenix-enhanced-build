@@ -8,19 +8,21 @@ fi
 srclib=${workdir}/srclib
 ndk=r21d
 
-if [ -z "${arch_code}" ]
+if [ -z "$1" ]
 then
-    arch_code=0
+    arch_code=2
+else
+    arch_code=$1
 fi
-Fenix_tag=v108.1.1
-Fenix_version=108.1.1
-Fenix_code=10811${arch_code}0
+Fenix_tag=v109.1.1
+Fenix_version=109.1.1
+Fenix_code=10911${arch_code}0
 
-FirefoxAndroid_tag=v108.1.1
+FirefoxAndroid_tag=components-v109.1.1
 MozAndroidComponentsAS_tag=v107.0.2
-MozAppServices_tag=v95.0.1
-MozBuild_commit=10e85e62977229eeaebf1da5a16d47af670e5822
-MozFennec_tag=FIREFOX_108_0_1_RELEASE
+MozAppServices_tag=v96.1.3
+MozBuild_commit=e78aea4f8842a2717d38aa6b63ce50a8998cc9d0
+MozFennec_tag=FIREFOX_109_0_RELEASE
 MozGlean_tag=v51.8.2
 MozGleanAS_tag=v51.2.0
 rustup_tag=1.25.1
@@ -104,6 +106,14 @@ popd
 # Fenix
 git clone --depth=1 --branch ${Fenix_tag} https://github.com/mozilla-mobile/fenix ${workdir}/fenix
 
+find ${workdir}/ -name gradle.properties -exec sed -i  \
+                                                   -e 's/org.gradle.daemon=true/org.gradle.daemon=false/g' \
+                                                   -e 's/org.gradle.parallel=false/org.gradle.parallel=true/g' \
+                                                   -e 's/org.gradle.vfs.watch=false/org.gradle.vfs.watch=true/g' \
+                                                   -e 's/org.gradle.caching=false/org.gradle.caching=true/g' \
+                                                   -e 's/org.gradle.configureondemand=false/org.gradle.configureondemand=true/g' \
+                                                   {} \;
+
 cd ${workdir}/fenix
 ${srclib}/MozBuild/prebuild.sh ${Fenix_version} ${Fenix_code}
 find ${srclib}/MozBuild -name .git -exec rm -rf {} \;
@@ -113,13 +123,7 @@ find ${srclib}/MozGlean -name .git -exec rm -rf {} \;
 find ${srclib}/MozGleanAS -name .git -exec rm -rf {} \;
 find ${srclib}/rustup -name .git -exec rm -rf {} \;
 find ${srclib}/wasi-sdk -name .git -exec rm -rf {} \;
-find ${workdir}/ -name gradle.properties -exec sed -i  \
-                                                   -e 's/org.gradle.daemon=true/org.gradle.daemon=false/g' \
-                                                   -e 's/org.gradle.parallel=false/org.gradle.parallel=true/g' \
-                                                   -e 's/org.gradle.vfs.watch=false/org.gradle.vfs.watch=true/g' \
-                                                   -e 's/org.gradle.caching=false/org.gradle.caching=true/g' \
-                                                   -e 's/org.gradle.configureondemand=false/org.gradle.configureondemand=true/g' \
-                                                   {} \;
+
 ${srclib}/MozBuild/build.sh
 
 gradle --stop

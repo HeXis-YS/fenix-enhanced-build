@@ -14,12 +14,14 @@ jobs:
         include:
           - arch_name: armeabi-v7a
             arch_code: 0
-          - arch_name: x86
-            arch_code: 1
+          # - arch_name: x86
+          #   arch_code: 1
           - arch_name: arm64-v8a
             arch_code: 2
-    env:
-      arch_code: ${{ matrix.arch_code }}
+          # - arch_name: x86_64
+          #   arch_code: 3
+      fail-fast: false
+
     steps:
       - name: Remove unused packages
         run: |
@@ -49,18 +51,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Run build script
-        run: sudo ./build.sh
+        run: sudo ./build.sh ${{ matrix.arch_code }}
       - name: Upload workflow artifacts
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.arch_name }}
           path: |
-            /tmp/*.apk
+            /tmp/app-${{ matrix.arch_name }}-release-unsigned.apk
       - name: Upload release assets
         if: startsWith(github.ref, 'refs/tags/')
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: "/tmp/*.apk"
+          file: "/tmp/app-${{ matrix.arch_name }}-release-unsigned.apk"
           tag: ${{ github.ref }}
           overwrite: true
