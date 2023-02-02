@@ -14,15 +14,15 @@ then
 else
     arch_code=$1
 fi
-Fenix_tag=v109.1.1
-Fenix_version=109.1.1
-Fenix_code=10911${arch_code}0
+Fenix_tag=v109.2.0
+Fenix_version=109.2.0
+Fenix_code=10920${arch_code}0
 
-FirefoxAndroid_tag=components-v109.1.1
+FirefoxAndroid_tag=components-v109.2.0
 MozAndroidComponentsAS_tag=v107.0.2
 MozAppServices_tag=v96.1.3
 MozBuild_commit=e78aea4f8842a2717d38aa6b63ce50a8998cc9d0
-MozFennec_tag=FIREFOX_109_0_RELEASE
+MozFennec_tag=FIREFOX_109_0_1_RELEASE
 MozGlean_tag=v51.8.2
 MozGleanAS_tag=v51.2.0
 rustup_tag=1.25.1
