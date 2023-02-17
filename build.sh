@@ -14,9 +14,11 @@ then
 else
     arch_code=$1
 fi
-Fenix_tag=v110.0.1
+
 Fenix_version=110.0.1
-Fenix_code=11001${arch_code}0
+Fenix_tag=v${Fenix_version}
+Fenix_revision=0
+Fenix_code=${Fenix_version//./}${arch_code}${Fenix_revision}
 
 FirefoxAndroid_tag=components-v110.0.1
 FirefoxAndroidAS_tag=v108.0.8
