@@ -27,7 +27,7 @@ MozBuild_commit=c7eb74747e917e0bfb4514f3aa8b715e64740e28
 MozFennec_tag=FIREFOX_110_0_RELEASE
 MozGlean_tag=v51.8.2
 MozGleanAS_tag=v51.8.2
-rustup_tag=1.25.2
+# rustup_tag=1.25.2
 wasisdk_tag=wasi-sdk-16
 
 export MOZBUILD_STATE_PATH=${workdir}/.mozbuild
@@ -109,7 +109,12 @@ git clone --depth=1 --branch ${MozGlean_tag} https://github.com/mozilla/glean.gi
 git clone --depth=1 --branch ${MozGleanAS_tag} https://github.com/mozilla/glean.git ${srclib}/MozGleanAS
 
 # rustup
-git clone --depth=1 --branch ${rustup_tag} https://github.com/rust-lang/rustup ${srclib}/rustup
+# git clone --depth=1 --branch ${rustup_tag} https://github.com/rust-lang/rustup ${srclib}/rustup
+git clone --depth=1 https://github.com/rust-lang/rustup ${srclib}/rustup
+pushd ${srclib}/rustup
+git fetch --tags
+git checkout $(git describe --tags `git rev-list --tags --max-count=1`)
+popd
 
 # wasi-sdk
 git clone --depth=1 --branch ${wasisdk_tag} https://github.com/WebAssembly/wasi-sdk.git ${srclib}/wasi-sdk
