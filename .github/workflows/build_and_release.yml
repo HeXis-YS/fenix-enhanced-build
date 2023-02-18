@@ -12,12 +12,16 @@ jobs:
     strategy:
       matrix:
         include:
-          - arch_name: armeabi-v7a
-            arch_code: 0
+          # - arch_name: armeabi-v7a
+          #   arch_code: 0
           # - arch_name: x86
           #   arch_code: 1
           - arch_name: arm64-v8a
             arch_code: 2
+            target_cpu: generic
+          - arch_name: arm64-v8a
+            arch_code: 2
+            target_cpu: cortex-a55
           # - arch_name: x86_64
           #   arch_code: 3
       fail-fast: false
@@ -38,24 +42,14 @@ jobs:
           sudo fallocate -l 7G /mnt/swapfile
           sudo mkswap /mnt/swapfile
           sudo swapon /mnt/swapfile
-      # - name: Maximize build space
-      #   uses: easimon/maximize-build-space@master
-      #   with:
-      #     overprovision-lvm: true
-      #     root-reserve-mb: 4096
-      #     temp-reserve-mb: 100
-      #     swap-size-mb: 7168
-      #     remove-dotnet: 'true'
-      #     remove-android: 'true'
-      #     remove-haskell: 'true'
       - name: Checkout
         uses: actions/checkout@v3
       - name: Run build script
-        run: sudo ./build.sh ${{ matrix.arch_code }}
+        run: sudo ./build.sh ${{ matrix.arch_code }} ${{ matrix.target_cpu }}
       - name: Upload workflow artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.arch_name }}
+          name: ${{ matrix.arch_name }}-${{ matrix.target_cpu }}
           path: |
             /tmp/app-${{ matrix.arch_name }}-release-unsigned.apk
       - name: Upload release assets
@@ -64,5 +58,6 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: "/tmp/app-${{ matrix.arch_name }}-release-unsigned.apk"
+          asset_name: app-${{ matrix.arch_name }}-${{ matrix.target_cpu }}-release-unsigned.apk
           tag: ${{ github.ref }}
           overwrite: true
