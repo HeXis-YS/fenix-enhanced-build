@@ -28,7 +28,7 @@ MozFennec_tag=FIREFOX_110_0_RELEASE
 MozGlean_tag=v51.8.2
 MozGleanAS_tag=v51.8.2
 # rustup_tag=1.25.2
-wasisdk_tag=wasi-sdk-16
+wasisdk_tag=wasi-sdk-19
 
 export MOZBUILD_STATE_PATH=${workdir}/.mozbuild
 export ANDROID_SDK=/opt/android-sdk
