@@ -42,7 +42,7 @@ export JAVA_HOME="/usr/lib/jvm/default-java"
 export GRADLE_OPTS="-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.vfs.watch=true -Dorg.gradle.caching=true -Dorg.gradle.configureondemand=true"
 
 apt update
-apt install -y cmake make m4 g++ pkg-config libssl-dev python-is-python3 python3-distutils python3-venv tcl gyp ninja-build bzip2 libz-dev libffi-dev libsqlite3-dev curl wget default-jdk-headless git mercurial-common sdkmanager zip unzip
+apt install -y cmake make m4 g++ pkg-config libssl-dev python-is-python3 python3-distutils python3-venv tcl gyp ninja-build bzip2 libz-dev libffi-dev libsqlite3-dev curl wget default-jdk-headless git sdkmanager zip unzip
 
 mkdir -p ${workdir}
 mkdir -p ${srclib}
@@ -84,9 +84,11 @@ git submodule update --init --depth=1
 popd
 
 # MozFennec
-hg clone --stream https://hg.mozilla.org/releases/mozilla-release/ ${srclib}/MozFennec
-pushd ${srclib}/MozFennec
-hg checkout ${MozFennec_tag}
+pushd ${srclib}
+wget -O MozFennec.zip https://hg.mozilla.org/releases/mozilla-release/archive/${MozFennec_tag}.zip
+unzip -o -q MozFennec.zip
+rm MozFennec.zip
+mv mozilla-release-${MozFennec_tag} MozFennec
 popd
 
 # MozGlean
@@ -120,7 +122,6 @@ cd ${workdir}/fenix
 ${srclib}/MozBuild/prebuild.sh ${Fenix_version} ${Fenix_code}
 find ${srclib}/MozBuild -name .git -exec rm -rf {} \;
 find ${srclib}/MozAppServices -name .git -exec rm -rf {} \;
-find ${srclib}/MozFennec -name .hg -exec rm -rf {} \;
 find ${srclib}/MozGlean -name .git -exec rm -rf {} \;
 find ${srclib}/MozGleanAS -name .git -exec rm -rf {} \;
 find ${srclib}/rustup -name .git -exec rm -rf {} \;
