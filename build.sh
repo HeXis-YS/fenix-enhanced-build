@@ -41,6 +41,17 @@ export ANDROID_NDK_HOME=${ANDROID_NDK}
 export JAVA_HOME="/usr/lib/jvm/default-java"
 export GRADLE_OPTS="-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.vfs.watch=true -Dorg.gradle.caching=true -Dorg.gradle.configureondemand=true"
 
+export CFLAGS="-DNDEBUG -s -w -O3 -pipe"
+export CXXFLAGS=${CFLAGS}
+export RUSTFLAGS="-C opt-level=3 -C codegen-units=1 -C strip=symbols -C debuginfo=0 -C panic=abort"
+export CARGO_PROFILE_RELEASE_LTO=true
+export CARGO_PROFILE_DEBUG_LTO=true
+if [ -n "$2" ]
+then
+    export CARGO_TARGET_AARCH64_LINUX_ANDROID_RUSTFLAGS="-C target-cpu=$2"
+fi
+export OPT_LEVEL=3
+
 apt update
 apt install -y cmake make m4 g++ pkg-config libssl-dev python-is-python3 python3-distutils python3-venv tcl gyp ninja-build bzip2 libz-dev libffi-dev libsqlite3-dev curl wget default-jdk-headless git sdkmanager zip unzip
 
