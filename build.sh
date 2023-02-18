@@ -14,18 +14,18 @@ then
 else
     arch_code=$1
 fi
-Fenix_tag=v109.2.0
-Fenix_version=109.2.0
-Fenix_code=10920${arch_code}0
+Fenix_tag=v110.0.1
+Fenix_version=110.0.1
+Fenix_code=11001${arch_code}0
 
-FirefoxAndroid_tag=components-v109.2.0
-MozAndroidComponentsAS_tag=v107.0.2
-MozAppServices_tag=v96.1.3
-MozBuild_commit=e78aea4f8842a2717d38aa6b63ce50a8998cc9d0
-MozFennec_tag=FIREFOX_109_0_1_RELEASE
+FirefoxAndroid_tag=components-v110.0.1
+FirefoxAndroidAS_tag=v108.0.8
+MozAppServices_tag=v96.2.1
+MozBuild_commit=c7eb74747e917e0bfb4514f3aa8b715e64740e28
+MozFennec_tag=FIREFOX_110_0_RELEASE
 MozGlean_tag=v51.8.2
-MozGleanAS_tag=v51.2.0
-rustup_tag=1.25.1
+MozGleanAS_tag=v51.8.2
+rustup_tag=1.25.2
 wasisdk_tag=wasi-sdk-16
 
 export MOZBUILD_STATE_PATH=${workdir}/.mozbuild
@@ -68,11 +68,11 @@ pushd ${srclib}/MozBuild
 git checkout ${MozBuild_commit}
 popd
 
-# MozAndroidComponentsAS
-git clone --depth=1 --branch ${MozAndroidComponentsAS_tag} https://github.com/mozilla-mobile/android-components.git ${srclib}/MozAndroidComponentsAS
-pushd ${srclib}/MozAndroidComponentsAS
-sed -i -e '/com.google.android.gms/d; /com.google.firebase/d' buildSrc/src/main/java/Dependencies.kt
-rm -fR components/feature/p2p components/lib/{nearby,push-amazon,push-firebase}
+# FirefoxAndroidAS
+git clone --depth=1 --branch ${FirefoxAndroidAS_tag} https://github.com/mozilla-mobile/firefox-android.git ${srclib}/FirefoxAndroidAS
+pushd ${srclib}/FirefoxAndroidAS
+sed -i -e '/com.google.firebase/d' android-components/plugins/dependencies/src/main/java/DependenciesPlugin.kt || sed -i -e '/com.google.firebase/d' android-components/buildSrc/src/main/java/Dependencies.kt
+rm -R android-components/components/lib/push-firebase
 popd
 
 # MozAppServices
