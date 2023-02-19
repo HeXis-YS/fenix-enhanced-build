@@ -10,8 +10,9 @@ else
     workdir=${GITHUB_WORKSPACE}/build
 fi
 srclib=${workdir}/srclib
-export ANDROID_SDK_ROOT=/opt/android-sdk
-ndk=$(sdkmanager --list | grep -o -P '(?<=ndk;)r[^-]*?(?=[ ]*\|)' | tail -1)
+# export ANDROID_SDK_ROOT=/opt/android-sdk
+# ndk=$(sdkmanager --list | grep -o -P '(?<=ndk;)r[^-]*?(?=[ ]*\|)' | tail -1)
+ndk=r21d
 
 echo workdir=${workdir}
 echo srclib=${srclib}
