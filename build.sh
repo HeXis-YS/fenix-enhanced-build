@@ -2,6 +2,7 @@
 apt update
 apt install -y cmake make m4 g++ pkg-config libssl-dev python-is-python3 python3-distutils python3-venv tcl gyp ninja-build bzip2 libz-dev libffi-dev libsqlite3-dev curl wget default-jdk-headless git sdkmanager zip unzip
 
+# Set base dir and ndk version
 if [ -z "${GITHUB_WORKSPACE}" ]
 then
     workdir=$(pwd)/build
@@ -12,18 +13,29 @@ srclib=${workdir}/srclib
 export ANDROID_SDK_ROOT=/opt/android-sdk
 ndk=$(sdkmanager --list | grep -o -P '(?<=ndk;)r[^-]*?(?=[ ]*\|)' | tail -1)
 
+echo workdir=${workdir}
+echo srclib=${srclib}
+echo ndk=${ndk}
+
+# Fenix version
 if [ -z "$1" ]
 then
     arch_code=2
 else
     arch_code=$1
 fi
-
 Fenix_version=110.0.1
 Fenix_tag=v${Fenix_version}
 Fenix_revision=0
 Fenix_code=${Fenix_version//./}${arch_code}${Fenix_revision}
 
+echo arch_code=${arch_code}
+echo Fenix_version=${Fenix_version}
+echo Fenix_tag=${Fenix_tag}
+echo Fenix_revision=${Fenix_revision}
+echo Fenix_code=${Fenix_code}
+
+# Component version
 FirefoxAndroid_tag=components-v110.0.1
 FirefoxAndroidAS_tag=v108.0.8
 MozAppServices_tag=v96.2.1
@@ -34,6 +46,17 @@ MozGleanAS_tag=v51.8.2
 # rustup_tag=1.25.2
 wasisdk_tag=wasi-sdk-19
 
+echo FirefoxAndroid_tag=${FirefoxAndroid_tag}
+echo FirefoxAndroidAS_tag=${FirefoxAndroidAS_tag}
+echo MozAppServices_tag=${MozAppServices_tag}
+echo MozBuild_commit=${MozBuild_commit}
+echo MozFennec_tag=${MozFennec_tag}
+echo MozGlean_tag=${MozGlean_tag}
+echo MozGleanAS_tag=${MozGleanAS_tag}
+echo rustup_tag=${rustup_tag}
+echo wasisdk_tag=${wasisdk_tag}
+
+# Set path
 export MOZBUILD_STATE_PATH=${workdir}/.mozbuild
 export ANDROID_SDK=/opt/android-sdk
 export ANDROID_NDK=/opt/android-sdk/ndk/${ndk}
@@ -43,8 +66,20 @@ export ANDROID_SDK_HOME=${ANDROID_SDK}
 export ANDROID_NDK_ROOT=${ANDROID_NDK}
 export ANDROID_NDK_HOME=${ANDROID_NDK}
 export JAVA_HOME="/usr/lib/jvm/default-java"
-export GRADLE_OPTS="-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.vfs.watch=true -Dorg.gradle.caching=true -Dorg.gradle.configureondemand=true"
 
+echo MOZBUILD_STATE_PATH=${MOZBUILD_STATE_PATH}
+echo ANDROID_SDK=${ANDROID_SDK}
+echo ANDROID_NDK=${ANDROID_NDK}
+echo ANDROID_HOME=${ANDROID_HOME}
+echo ANDROID_SDK_ROOT=${ANDROID_SDK_ROOT}
+echo ANDROID_SDK_HOME=${ANDROID_SDK_HOME}
+echo ANDROID_NDK_ROOT=${ANDROID_NDK_ROOT}
+echo ANDROID_NDK_HOME=${ANDROID_NDK_HOME}
+echo JAVA_HOME=${JAVA_HOME}
+
+
+# Optimization flags
+export GRADLE_OPTS="-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.vfs.watch=true -Dorg.gradle.caching=true -Dorg.gradle.configureondemand=true"
 export CFLAGS="-DNDEBUG -s -w -O3 -pipe"
 export CXXFLAGS=${CFLAGS}
 export RUSTFLAGS="-C opt-level=3 -C codegen-units=1 -C strip=symbols -C debuginfo=0 -C panic=abort"
@@ -55,6 +90,16 @@ then
     export CARGO_TARGET_AARCH64_LINUX_ANDROID_RUSTFLAGS="-C target-cpu=$2"
 fi
 export OPT_LEVEL=3
+
+echo GRADLE_OPTS=${GRADLE_OPTS}
+echo CFLAGS=${CFLAGS}
+echo CXXFLAGS=${CXXFLAGS}
+echo RUSTFLAGS=${RUSTFLAGS}
+echo CARGO_PROFILE_RELEASE_LTO=${CARGO_PROFILE_RELEASE_LTO}
+echo CARGO_PROFILE_DEBUG_LTO=${CARGO_PROFILE_DEBUG_LTO}
+echo CARGO_TARGET_AARCH64_LINUX_ANDROID_RUSTFLAGS=${CARGO_TARGET_AARCH64_LINUX_ANDROID_RUSTFLAGS}
+echo OPT_LEVEL=${OPT_LEVEL}
+
 
 mkdir -p ${workdir}
 mkdir -p ${srclib}
