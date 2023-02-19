@@ -1,4 +1,7 @@
 #!/bin/bash
+apt update
+apt install -y cmake make m4 g++ pkg-config libssl-dev python-is-python3 python3-distutils python3-venv tcl gyp ninja-build bzip2 libz-dev libffi-dev libsqlite3-dev curl wget default-jdk-headless git sdkmanager zip unzip
+
 if [ -z "${GITHUB_WORKSPACE}" ]
 then
     workdir=$(pwd)/build
@@ -6,7 +9,8 @@ else
     workdir=${GITHUB_WORKSPACE}/build
 fi
 srclib=${workdir}/srclib
-ndk=r21d
+export ANDROID_SDK_ROOT=/opt/android-sdk
+ndk=$(sdkmanager --list | grep -o -P '(?<=ndk;)r[^-]*?(?=[ ]*\|)' | tail -1)
 
 if [ -z "$1" ]
 then
@@ -51,9 +55,6 @@ then
     export CARGO_TARGET_AARCH64_LINUX_ANDROID_RUSTFLAGS="-C target-cpu=$2"
 fi
 export OPT_LEVEL=3
-
-apt update
-apt install -y cmake make m4 g++ pkg-config libssl-dev python-is-python3 python3-distutils python3-venv tcl gyp ninja-build bzip2 libz-dev libffi-dev libsqlite3-dev curl wget default-jdk-headless git sdkmanager zip unzip
 
 mkdir -p ${workdir}
 mkdir -p ${srclib}
