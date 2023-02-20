@@ -17,7 +17,7 @@ echo ndk=${ndk}
 
 Fenix_version=110.0.1
 Fenix_tag=v${Fenix_version}
-Fenix_revision=0
+Fenix_revision=1
 
 echo Fenix_version=${Fenix_version}
 echo Fenix_tag=${Fenix_tag}
