@@ -17,7 +17,7 @@ echo ndk=${ndk}
 
 Fenix_version=110.0.1
 Fenix_tag=v${Fenix_version}
-Fenix_revision=0
+Fenix_revision=2
 
 echo Fenix_version=${Fenix_version}
 echo Fenix_tag=${Fenix_tag}
@@ -44,7 +44,7 @@ function get_source {
     FirefoxAndroid_tag=components-v110.0.1
     FirefoxAndroidAS_tag=v108.0.8
     MozAppServices_tag=v96.2.1
-    MozBuild_commit=e1534569d12f126b967c39d8716e72ceb88dd7fb
+    MozBuild_commit=12d8553656bedfbe3e8e28d291309b42feeb9fdf
     MozFennec_tag=FIREFOX_110_0_RELEASE
     MozGlean_tag=v51.8.2
     MozGleanAS_tag=v51.8.2
