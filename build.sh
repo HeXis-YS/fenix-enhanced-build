@@ -44,7 +44,7 @@ function get_source {
     FirefoxAndroid_tag=components-v110.0.1
     FirefoxAndroidAS_tag=v108.0.8
     MozAppServices_tag=v96.2.1
-    MozBuild_commit=12d8553656bedfbe3e8e28d291309b42feeb9fdf
+    MozBuild_commit=09c5d973c734d4555e047917353c1216721961fe
     MozFennec_tag=FIREFOX_110_0_RELEASE
     MozGlean_tag=v51.8.2
     MozGleanAS_tag=v51.8.2
