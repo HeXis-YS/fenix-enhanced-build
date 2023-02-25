@@ -44,7 +44,7 @@ function get_source {
     FirefoxAndroid_tag=components-v110.0.1
     FirefoxAndroidAS_tag=v108.0.8
     MozAppServices_tag=v96.2.1
-    MozBuild_commit=09c5d973c734d4555e047917353c1216721961fe
+    MozBuild_commit=ae3f653bfe716c1a74fb94b91fb51899dcc14b05
     MozFennec_tag=FIREFOX_110_0_RELEASE
     MozGlean_tag=v51.8.2
     MozGleanAS_tag=v51.8.2
@@ -150,6 +150,7 @@ function build {
     export ANDROID_NDK_ROOT=${ANDROID_NDK}
     export ANDROID_NDK_HOME=${ANDROID_NDK}
     export JAVA_HOME="/usr/lib/jvm/default-java"
+    export PATH=${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools
 
     echo MOZBUILD_STATE_PATH=${MOZBUILD_STATE_PATH}
     echo ANDROID_SDK=${ANDROID_SDK}
@@ -160,9 +161,11 @@ function build {
     echo ANDROID_NDK_ROOT=${ANDROID_NDK_ROOT}
     echo ANDROID_NDK_HOME=${ANDROID_NDK_HOME}
     echo JAVA_HOME=${JAVA_HOME}
+    echo PATH=${PATH}
 
 
     # Optimization flags
+    mkdir -p ~/.gradle && echo "org.gradle.daemon=false" >> ~/.gradle/gradle.properties
     export GRADLE_OPTS="-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.vfs.watch=true -Dorg.gradle.caching=true -Dorg.gradle.configureondemand=true"
     export CFLAGS="-DNDEBUG -s -w -O3 -pipe"
     export CXXFLAGS=${CFLAGS}
@@ -196,7 +199,7 @@ function build {
     ${srclib}/MozBuild/build.sh
 
     gradle --stop
-    mv ${workdir}/fenix/app/build/outputs/apk/release/*.apk /tmp/
+    cp ${workdir}/fenix/app/build/outputs/apk/release/*.apk /tmp/
 }
 
 case $1 in
