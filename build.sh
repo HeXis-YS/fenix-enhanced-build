@@ -1,4 +1,47 @@
 #!/bin/bash
+# Set default value
+arch_code=2;
+
+# Parse arguments
+VALID_ARGS=$(getopt -o p:a:t: --long platform:,arch:,tune: -- "$@")
+if [[ $? -ne 0 ]]; then
+    exit 1;
+fi
+
+eval set -- "$VALID_ARGS"
+while [ : ]; do
+  case "$1" in
+    -p | --platform)
+        case $2 in
+            "ARMv7" | "x86" | "x86_64")
+                echo "Platform $2 is not supported currently"
+                exit 1
+                ;;
+                "AArch64")
+                arch_code=2;
+                ;;
+            *)
+                echo "$2 is not recognized as a valid value for $1"
+                echo "Permitted values are ARMv7, AArch64, x86, x86_64"
+                exit 1
+                ;;
+        esac
+        shift 2
+        ;;
+    -a | --arch)
+        export TARGET_ARCH_VARIANT=$2
+        shift 2
+        ;;
+    -t | --tune)
+        export TARGET_CPU_VARIANT=$2
+        shift 2
+        ;;
+    --) shift; 
+        break 
+        ;;
+  esac
+done
+
 # Set base dir and ndk version
 if [ -z "${GITHUB_WORKSPACE}" ]
 then
@@ -15,12 +58,6 @@ ndk=r21d
 Fenix_version=110.0.1
 Fenix_tag=v${Fenix_version}
 Fenix_revision=2
-if [ -z "$1" ]
-then
-    arch_code=2
-else
-    arch_code=$1
-fi
 Fenix_code=${Fenix_version//./}${arch_code}${Fenix_revision}
 
 # Component version
@@ -54,11 +91,13 @@ export CXXFLAGS=${CFLAGS}
 export RUSTFLAGS="-C opt-level=3 -C codegen-units=1 -C strip=symbols -C debuginfo=0 -C panic=abort"
 export CARGO_PROFILE_RELEASE_LTO=true
 export CARGO_PROFILE_DEBUG_LTO=true
-if [ -n "$2" ]
+if [ -n "${TARGET_CPU_VARIANT}" ]
 then
-    export CARGO_TARGET_AARCH64_LINUX_ANDROID_RUSTFLAGS="-C target-cpu=$2"
+    export CARGO_TARGET_AARCH64_LINUX_ANDROID_RUSTFLAGS="-C target-cpu=${TARGET_CPU_VARIANT}"
 fi
 export OPT_LEVEL=3
+
+set -o posix ; set
 
 apt update
 apt install -y cmake make m4 g++ pkg-config libssl-dev python-is-python3 python3-distutils python3-venv tcl gyp ninja-build bzip2 libz-dev libffi-dev libsqlite3-dev curl wget default-jdk-headless git sdkmanager zip unzip
