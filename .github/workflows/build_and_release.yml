@@ -42,14 +42,11 @@ jobs:
           sudo fallocate -l 7G /mnt/swapfile
           sudo mkswap /mnt/swapfile
           sudo swapon /mnt/swapfile
+          df -h
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Get dependencies
-        run: sudo ./build.sh ci-dependency
-      - name: Get source
-        run: sudo ./build.sh ci-source
       - name: Build
-        run: sudo ./build.sh ci-build ${{ matrix.arch_code }} ${{ matrix.target_cpu }}
+        run: sudo ./build.sh ${{ matrix.arch_code }} ${{ matrix.target_cpu }}
       - name: Upload workflow artifacts
         uses: actions/upload-artifact@v3
         with:
