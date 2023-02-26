@@ -114,6 +114,9 @@ sdkmanager "platform-tools"
 
 # FirefoxAndroid
 git clone --depth=1 --branch ${FirefoxAndroid_tag} https://github.com/mozilla-mobile/firefox-android.git ${srclib}/FirefoxAndroid
+if [ ${FirefoxAndroid_tag} == ${FirefoxAndroidAS_tag} ]; then
+    cp -r ${srclib}/FirefoxAndroid ${FirefoxAndroidAS_tag}
+fi
 pushd ${srclib}/FirefoxAndroid
 sed -i -e '/com.google.firebase/d' android-components/plugins/dependencies/src/main/java/DependenciesPlugin.kt
 rm -fR android-components/components/lib/push-firebase
@@ -126,7 +129,9 @@ git checkout ${MozBuild_commit}
 popd
 
 # FirefoxAndroidAS
-git clone --depth=1 --branch ${FirefoxAndroidAS_tag} https://github.com/mozilla-mobile/firefox-android.git ${srclib}/FirefoxAndroidAS
+if [ ${FirefoxAndroid_tag} != ${FirefoxAndroidAS_tag} ]; then
+    git clone --depth=1 --branch ${FirefoxAndroidAS_tag} https://github.com/mozilla-mobile/firefox-android.git ${srclib}/FirefoxAndroidAS
+fi
 pushd ${srclib}/FirefoxAndroidAS
 sed -i -e '/com.google.firebase/d' android-components/plugins/dependencies/src/main/java/DependenciesPlugin.kt || sed -i -e '/com.google.firebase/d' android-components/buildSrc/src/main/java/Dependencies.kt
 rm -R android-components/components/lib/push-firebase
@@ -148,9 +153,14 @@ popd
 
 # MozGlean
 git clone --depth=1 --branch ${MozGlean_tag} https://github.com/mozilla/glean.git ${srclib}/MozGlean
+if [ ${MozGlean_tag} == ${MozGleanAS_tag} ]; then
+    cp -r ${srclib}/MozGlean ${srclib}/MozGleanAS
+fi
 
 # MozGleanAS
-git clone --depth=1 --branch ${MozGleanAS_tag} https://github.com/mozilla/glean.git ${srclib}/MozGleanAS
+if [ ${MozGlean_tag} != ${MozGleanAS_tag} ]; then
+    git clone --depth=1 --branch ${MozGleanAS_tag} https://github.com/mozilla/glean.git ${srclib}/MozGleanAS
+fi
 
 # rustup
 # git clone --depth=1 --branch ${rustup_tag} https://github.com/rust-lang/rustup ${srclib}/rustup
