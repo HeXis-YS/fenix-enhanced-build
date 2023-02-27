@@ -64,7 +64,7 @@ Fenix_code=${Fenix_version//./}${arch_code}${Fenix_revision}
 FirefoxAndroid_tag=components-v110.0.1
 FirefoxAndroidAS_tag=v108.0.8
 MozAppServices_tag=v96.2.1
-MozBuild_commit=ae3f653bfe716c1a74fb94b91fb51899dcc14b05
+MozBuild_commit=1c45c229b2825247b84ccda2a6ee6041a6f5010b
 MozFennec_tag=FIREFOX_110_0_RELEASE
 MozGlean_tag=v51.8.2
 MozGleanAS_tag=v51.8.2
@@ -91,9 +91,14 @@ export CXXFLAGS=${CFLAGS}
 export RUSTFLAGS="-C opt-level=3 -C codegen-units=1 -C strip=symbols -C debuginfo=0 -C panic=abort"
 export CARGO_PROFILE_RELEASE_LTO=true
 export CARGO_PROFILE_DEBUG_LTO=true
+if [ -n "${TARGET_ARCH_VARIANT}" ]
+then
+    export CFLAGS_TUNE="-march=${TARGET_ARCH_VARIANT}"
+fi
 if [ -n "${TARGET_CPU_VARIANT}" ]
 then
     export CARGO_TARGET_AARCH64_LINUX_ANDROID_RUSTFLAGS="-C target-cpu=${TARGET_CPU_VARIANT}"
+    export CFLAGS_TUNE="${CFLAGS_TUNE} -mtune=${TARGET_CPU_VARIANT}"
 fi
 export OPT_LEVEL=3
 
