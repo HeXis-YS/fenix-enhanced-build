@@ -1,9 +1,10 @@
 #!/bin/bash
 # Set default value
 arch_code=2;
+o_optimize_level=3;
 
 # Parse arguments
-VALID_ARGS=$(getopt -o p:a:t: --long platform:,arch:,tune: -- "$@")
+VALID_ARGS=$(getopt -o a:o:p:t: --long arch:,optimize:,platform:,tune: -- "$@")
 if [[ $? -ne 0 ]]; then
     exit 1;
 fi
@@ -11,14 +12,34 @@ fi
 eval set -- "$VALID_ARGS"
 while [ : ]; do
   case "$1" in
+    -a | --arch)
+        export TARGET_ARCH_VARIANT=$2
+        shift 2
+        ;;
+    -o | --optimize)
+        case $2 in
+            "0" | "1" | "2" | "3")
+                o_optimize_level=$2
+                ;;
+            "4" | "f" | "fast")
+                o_optimize_level="fast"
+                ;;
+            *)
+                echo "$2 is not recognized as a valid value for $1"
+                echo "Permitted values are 0, 1, 2, 3, 4, f, fast"
+                exit 1
+                ;;
+        esac
+        shift 2
+        ;;
     -p | --platform)
         case $2 in
             "ARMv7" | "x86" | "x86_64")
                 echo "Platform $2 is not supported currently"
                 exit 1
                 ;;
-                "AArch64")
-                arch_code=2;
+            "AArch64")
+                arch_code=2
                 ;;
             *)
                 echo "$2 is not recognized as a valid value for $1"
@@ -26,10 +47,6 @@ while [ : ]; do
                 exit 1
                 ;;
         esac
-        shift 2
-        ;;
-    -a | --arch)
-        export TARGET_ARCH_VARIANT=$2
         shift 2
         ;;
     -t | --tune)
@@ -86,7 +103,7 @@ export PATH=${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools
 # Optimization flags
 mkdir -p ~/.gradle && echo "org.gradle.daemon=false" >> ~/.gradle/gradle.properties
 export GRADLE_OPTS="-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.vfs.watch=true -Dorg.gradle.caching=true -Dorg.gradle.configureondemand=true"
-export CFLAGS="-DNDEBUG -s -w -O3 -pipe"
+export CFLAGS="-DNDEBUG -s -w -O${o_optimize_level} -pipe"
 export CXXFLAGS=${CFLAGS}
 export RUSTFLAGS="-C opt-level=3 -C codegen-units=1 -C strip=symbols -C debuginfo=0 -C panic=abort"
 export CARGO_PROFILE_RELEASE_LTO=true
