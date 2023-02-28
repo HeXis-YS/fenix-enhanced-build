@@ -165,7 +165,7 @@ popd
 
 # MozFennec
 pushd ${srclib}
-wget -O MozFennec.zip https://hg.mozilla.org/releases/mozilla-release/archive/${MozFennec_tag}.zip
+wget --progress=bar:force:noscroll -O MozFennec.zip https://hg.mozilla.org/releases/mozilla-release/archive/${MozFennec_tag}.zip
 unzip -o -q MozFennec.zip
 rm MozFennec.zip
 mv mozilla-release-${MozFennec_tag} MozFennec
