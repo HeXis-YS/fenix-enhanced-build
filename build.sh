@@ -78,7 +78,7 @@ Fenix_code=${Fenix_version//./}${arch_code}${Fenix_revision}
 FirefoxAndroid_tag=components-v110.0.1
 FirefoxAndroidAS_tag=v108.0.8
 MozAppServices_tag=v96.2.1
-MozBuild_commit=1c45c229b2825247b84ccda2a6ee6041a6f5010b
+# MozBuild_commit=1c45c229b2825247b84ccda2a6ee6041a6f5010b
 MozFennec_tag=FIREFOX_110_0_RELEASE
 MozGlean_tag=v51.8.2
 MozGleanAS_tag=v51.8.2
@@ -142,10 +142,10 @@ rm -fR android-components/components/lib/push-firebase
 popd
 
 # MozBuild
-git clone https://github.com/HeXis-YS/fenixbuild.git ${srclib}/MozBuild
-pushd ${srclib}/MozBuild
-git checkout ${MozBuild_commit}
-popd
+git clone -b master-dev --depth=1 https://github.com/HeXis-YS/fenixbuild.git ${srclib}/MozBuild
+# pushd ${srclib}/MozBuild
+# git checkout ${MozBuild_commit}
+# popd
 
 # FirefoxAndroidAS
 if [ ${FirefoxAndroid_tag} != ${FirefoxAndroidAS_tag} ]; then
