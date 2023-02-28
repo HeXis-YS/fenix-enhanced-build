@@ -21,12 +21,9 @@ while [ : ]; do
             "0" | "1" | "2" | "3")
                 o_optimize_level=$2
                 ;;
-            "4" | "f" | "fast")
-                o_optimize_level="fast"
-                ;;
             *)
                 echo "$2 is not recognized as a valid value for $1"
-                echo "Permitted values are 0, 1, 2, 3, 4, f, fast"
+                echo "Permitted values are 0, 1, 2, 3"
                 exit 1
                 ;;
         esac

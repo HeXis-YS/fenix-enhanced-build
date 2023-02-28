@@ -19,7 +19,7 @@ jobs:
           - platform: AArch64
             target_arch: armv8.2-a
             target_cpu: cortex-a55
-            optimize_level: fast
+            optimize_level: 3
       fail-fast: false
 
     steps:
