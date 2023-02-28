@@ -163,6 +163,7 @@ popd
 git clone --depth=1 --branch ${MozAppServices_tag} https://github.com/mozilla/application-services.git ${srclib}/MozAppServices
 pushd ${srclib}/MozAppServices
 git submodule update --init --depth=1
+sed -i -e $'/^.*Build NSPR.*/i sed -i -e \'s/-O[0-3]/${CFLAGS} ${CFLAGS_TUNE}/g\' $(grep -lR -- -O[0-3])' libs/build-nss-android.sh
 popd
 
 # MozFennec
@@ -197,6 +198,7 @@ git clone --depth=1 --branch ${wasisdk_tag} https://github.com/WebAssembly/wasi-
 git clone https://git.savannah.gnu.org/git/config.git ${srclib}/wasi-sdk/src/config
 pushd ${srclib}/wasi-sdk
 git submodule update --init --depth=1
+sed -i -e 's/MinSizeRel/Release/g' Makefile
 popd
 
 # Fenix
