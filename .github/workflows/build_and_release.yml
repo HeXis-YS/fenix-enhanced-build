@@ -12,18 +12,14 @@ jobs:
     strategy:
       matrix:
         include:
-          # - arch_name: armeabi-v7a
-          #   arch_code: 0
-          # - arch_name: x86
-          #   arch_code: 1
-          - arch_name: arm64-v8a
-            arch_code: 2
+          - platform: arm64-v8a
+            target_arch: armv8-a
             target_cpu: generic
-          - arch_name: arm64-v8a
-            arch_code: 2
+            optimize_level: 3
+          - platform: arm64-v8a
+            target_arch: armv8.2-a
             target_cpu: cortex-a55
-          # - arch_name: x86_64
-          #   arch_code: 3
+            optimize_level: 3
       fail-fast: false
 
     steps:
@@ -42,26 +38,23 @@ jobs:
           sudo fallocate -l 7G /mnt/swapfile
           sudo mkswap /mnt/swapfile
           sudo swapon /mnt/swapfile
+          df -h
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Get dependencies
-        run: sudo ./build.sh ci-dependency
-      - name: Get source
-        run: sudo ./build.sh ci-source
       - name: Build
-        run: sudo ./build.sh ci-build ${{ matrix.arch_code }} ${{ matrix.target_cpu }}
+        run: sudo ./build.sh -p ${{ matrix.platform }} -a ${{ matrix.target_arch }} -t ${{ matrix.target_cpu }} -o ${{ matrix.optimize_level }}
       - name: Upload workflow artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.arch_name }}-${{ matrix.target_cpu }}
+          name: ${{ matrix.platform }}-${{ matrix.target_cpu }}
           path: |
-            /tmp/app-${{ matrix.arch_name }}-release-unsigned.apk
+            /tmp/app-${{ matrix.platform }}-release-unsigned.apk
       - name: Upload release assets
         if: startsWith(github.ref, 'refs/tags/')
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: "/tmp/app-${{ matrix.arch_name }}-release-unsigned.apk"
-          asset_name: app-${{ matrix.arch_name }}-${{ matrix.target_cpu }}-release-unsigned.apk
+          file: "/tmp/app-${{ matrix.platform }}-release-unsigned.apk"
+          asset_name: app-${{ matrix.platform }}-${{ matrix.target_cpu }}-release-unsigned.apk
           tag: ${{ github.ref }}
           overwrite: true
