@@ -31,16 +31,16 @@ while [ : ]; do
         ;;
     -p | --platform)
         case $2 in
-            "ARMv7" | "x86" | "x86_64")
+            "armeabi-v7a" | "x86" | "x86_64")
                 echo "Platform $2 is not supported currently"
                 exit 1
                 ;;
-            "AArch64")
+            "arm64-v8a")
                 arch_code=2
                 ;;
             *)
                 echo "$2 is not recognized as a valid value for $1"
-                echo "Permitted values are ARMv7, AArch64, x86, x86_64"
+                echo "Permitted values are arm64-v8a, AArch64, x86, x86_64"
                 exit 1
                 ;;
         esac

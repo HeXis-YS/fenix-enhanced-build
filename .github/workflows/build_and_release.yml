@@ -12,11 +12,11 @@ jobs:
     strategy:
       matrix:
         include:
-          - platform: AArch64
+          - platform: arm64-v8a
             target_arch: armv8-a
             target_cpu: generic
             optimize_level: 3
-          - platform: AArch64
+          - platform: arm64-v8a
             target_arch: armv8.2-a
             target_cpu: cortex-a55
             optimize_level: 3
