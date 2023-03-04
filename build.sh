@@ -69,17 +69,16 @@ srclib=${workdir}/srclib
 ndk=r21d
 
 # Fenix version
-Fenix_version=110.0.1
-Fenix_tag=v${Fenix_version}
-Fenix_revision=2
+Fenix_version=110.1.0
+Fenix_tag=fenix-v${Fenix_version}
+Fenix_revision=0
 Fenix_code=${Fenix_version//./}${arch_code}${Fenix_revision}
 
 # Component version
-FirefoxAndroid_tag=components-v110.0.1
 FirefoxAndroidAS_tag=v108.0.8
 MozAppServices_tag=v96.2.1
-MozBuild_commit=1c45c229b2825247b84ccda2a6ee6041a6f5010b
-MozFennec_tag=FIREFOX_110_0_RELEASE
+MozBuild_commit=2b9af62c807031070f71514858ae83e99dece0bb
+MozFennec_tag=FIREFOX_110_0_1_RELEASE
 MozGlean_tag=v51.8.2
 MozGleanAS_tag=v51.8.2
 # rustup_tag=1.25.2
@@ -131,16 +130,6 @@ sdkmanager "ndk;${ndk}"
 sdkmanager "ndk;21.3.6528147"
 sdkmanager "platform-tools"
 
-# FirefoxAndroid
-git clone --depth=1 --branch ${FirefoxAndroid_tag} https://github.com/mozilla-mobile/firefox-android.git ${srclib}/FirefoxAndroid
-if [ ${FirefoxAndroid_tag} == ${FirefoxAndroidAS_tag} ]; then
-    cp -r ${srclib}/FirefoxAndroid ${FirefoxAndroidAS_tag}
-fi
-pushd ${srclib}/FirefoxAndroid
-sed -i -e '/com.google.firebase/d' android-components/plugins/dependencies/src/main/java/DependenciesPlugin.kt
-rm -fR android-components/components/lib/push-firebase
-popd
-
 # MozBuild
 git clone --depth=1 https://github.com/HeXis-YS/fenixbuild.git ${srclib}/MozBuild
 pushd ${srclib}/MozBuild
@@ -148,9 +137,7 @@ git checkout ${MozBuild_commit}
 popd
 
 # FirefoxAndroidAS
-if [ ${FirefoxAndroid_tag} != ${FirefoxAndroidAS_tag} ]; then
-    git clone --depth=1 --branch ${FirefoxAndroidAS_tag} https://github.com/mozilla-mobile/firefox-android.git ${srclib}/FirefoxAndroidAS
-fi
+git clone --depth=1 --branch ${FirefoxAndroidAS_tag} https://github.com/mozilla-mobile/firefox-android.git ${srclib}/FirefoxAndroidAS
 pushd ${srclib}/FirefoxAndroidAS
 sed -i -e '/com.google.firebase/d' android-components/plugins/dependencies/src/main/java/DependenciesPlugin.kt || sed -i -e '/com.google.firebase/d' android-components/buildSrc/src/main/java/Dependencies.kt
 rm -R android-components/components/lib/push-firebase
@@ -199,7 +186,11 @@ sed -i -e 's/MinSizeRel/Release/g' Makefile
 popd
 
 # Fenix
-git clone --depth=1 --branch ${Fenix_tag} https://github.com/mozilla-mobile/fenix ${workdir}/fenix
+git clone --depth=1 --branch ${Fenix_tag} https://github.com/mozilla-mobile/firefox-android ${workdir}/fenix
+pushd ${workdir}/fenix
+sed -i -e '/com.google.firebase/d' android-components/plugins/dependencies/src/main/java/DependenciesPlugin.kt || sed -i -e '/com.google.firebase/d' android-components/buildSrc/src/main/java/Dependencies.kt
+rm -R android-components/components/lib/push-firebase
+popd
 
 find ${workdir}/ -name gradle.properties -exec sed -i  \
                                                 -e 's/org.gradle.daemon=true/org.gradle.daemon=false/g' \
