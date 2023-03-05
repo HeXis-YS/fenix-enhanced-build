@@ -195,8 +195,6 @@ popd
 find ${workdir}/ -name gradle.properties -exec sed -i  \
                                                 -e 's/org.gradle.daemon=true/org.gradle.daemon=false/g' \
                                                 -e 's/org.gradle.parallel=false/org.gradle.parallel=true/g' \
-                                                -e 's/org.gradle.vfs.watch=false/org.gradle.vfs.watch=true/g' \
-                                                -e 's/org.gradle.caching=false/org.gradle.caching=true/g' \
                                                 -e 's/org.gradle.configureondemand=false/org.gradle.configureondemand=true/g' \
                                                 {} \;
 
