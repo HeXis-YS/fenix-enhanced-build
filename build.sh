@@ -40,7 +40,7 @@ while [ : ]; do
                 ;;
             *)
                 echo "$2 is not recognized as a valid value for $1"
-                echo "Permitted values are arm64-v8a, AArch64, x86, x86_64"
+                echo "Permitted values are armeabi-v7a, arm64-v8a, x86, x86_64"
                 exit 1
                 ;;
         esac
@@ -77,12 +77,12 @@ Fenix_code=${Fenix_version//./}${arch_code}${Fenix_revision}
 # Component version
 FirefoxAndroidAS_tag=components-v110.0.1
 MozAppServices_tag=v97.2.0
-MozBuild_commit=ae8413672222a963d96e4fae20b06e8dea6baca6
+MozBuild_commit=8e60794ab9af3fcb79e44431fe9d963d8eb3ba33
 MozFennec_tag=FIREFOX_112_0_1_RELEASE
 MozGlean_tag=v52.3.0
 MozGleanAS_tag=v52.2.0
-# rustup_tag=1.25.2
-wasisdk_tag=wasi-sdk-19
+rustup_tag=1.25.2
+wasisdk_tag=wasi-sdk-16
 
 # Set path
 export MOZBUILD_STATE_PATH=${workdir}/.mozbuild
@@ -170,12 +170,7 @@ if [ ${MozGlean_tag} != ${MozGleanAS_tag} ]; then
 fi
 
 # rustup
-# git clone --depth=1 --branch ${rustup_tag} https://github.com/rust-lang/rustup ${srclib}/rustup
-git clone --depth=1 https://github.com/rust-lang/rustup ${srclib}/rustup
-pushd ${srclib}/rustup
-git fetch --tags
-git checkout $(git describe --tags `git rev-list --tags --max-count=1`)
-popd
+git clone --depth=1 --branch ${rustup_tag} https://github.com/rust-lang/rustup ${srclib}/rustup
 
 # wasi-sdk
 git clone --depth=1 --branch ${wasisdk_tag} https://github.com/WebAssembly/wasi-sdk.git ${srclib}/wasi-sdk
