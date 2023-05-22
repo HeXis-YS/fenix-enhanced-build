@@ -50,7 +50,8 @@ while [ : ]; do
         export TARGET_CPU_VARIANT=$2
         shift 2
         ;;
-    --) shift; 
+    --)
+        shift; 
         break 
         ;;
   esac
@@ -69,19 +70,19 @@ srclib=${workdir}/srclib
 ndk=r21d
 
 # Fenix version
-Fenix_version=112.1.0
-Fenix_tag=fenix-v${Fenix_version}
+Fenix_version=113.0.0
+Fenix_tag=fenix-v113.0
 Fenix_revision=0
 Fenix_code=${Fenix_version//./}${arch_code}${Fenix_revision}
 
 # Component version
-FirefoxAndroidAS_tag=components-v110.0.1
-MozAppServices_tag=v97.2.0
-MozBuild_commit=8e60794ab9af3fcb79e44431fe9d963d8eb3ba33
-MozFennec_tag=FIREFOX_112_0_1_RELEASE
-MozGlean_tag=v52.3.0
+FirefoxAndroidAS_tag=components-v111.1.1
+MozAppServices_tag=v97.4.1
+MozBuild_commit=572df79bc00cc8b1ca3dd8d13582de9cf9f2e283
+MozFennec_tag=FIREFOX_113_0_RELEASE
+MozGlean_tag=v52.4.2
 MozGleanAS_tag=v52.2.0
-rustup_tag=1.25.2
+rustup_tag=1.26.0
 wasisdk_tag=wasi-sdk-16
 
 # Set path
@@ -99,19 +100,19 @@ export PATH=${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools
 # Optimization flags
 mkdir -p ~/.gradle && echo "org.gradle.daemon=false" >> ~/.gradle/gradle.properties
 export GRADLE_OPTS="-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.vfs.watch=true -Dorg.gradle.caching=true -Dorg.gradle.configureondemand=true"
-export CFLAGS="-DNDEBUG -s -w -O${o_optimize_level} -pipe"
-export CXXFLAGS=${CFLAGS}
+# export CFLAGS="-DNDEBUG -s -w -O${o_optimize_level} -pipe"
+# export CXXFLAGS=${CFLAGS}
 export RUSTFLAGS="-C opt-level=3 -C codegen-units=1 -C strip=symbols -C debuginfo=0 -C panic=abort"
 export CARGO_PROFILE_RELEASE_LTO=true
 export CARGO_PROFILE_DEBUG_LTO=true
-if [ -n "${TARGET_ARCH_VARIANT}" ]
-then
-    export CFLAGS_TUNE="-march=${TARGET_ARCH_VARIANT}"
-fi
+# if [ -n "${TARGET_ARCH_VARIANT}" ]
+# then
+#     export CFLAGS_TUNE="-march=${TARGET_ARCH_VARIANT}"
+# fi
 if [ -n "${TARGET_CPU_VARIANT}" ]
 then
     export CARGO_TARGET_AARCH64_LINUX_ANDROID_RUSTFLAGS="-C target-cpu=${TARGET_CPU_VARIANT}"
-    export CFLAGS_TUNE="${CFLAGS_TUNE} -mtune=${TARGET_CPU_VARIANT}"
+    # export CFLAGS_TUNE="${CFLAGS_TUNE} -mtune=${TARGET_CPU_VARIANT}"
 fi
 export OPT_LEVEL=3
 
@@ -131,7 +132,7 @@ sdkmanager "ndk;21.3.6528147"
 sdkmanager "platform-tools"
 
 # MozBuild
-git clone --depth=1 https://github.com/HeXis-YS/fenixbuild.git ${srclib}/MozBuild
+git clone -b wrapper --depth=1 https://github.com/HeXis-YS/fenixbuild.git ${srclib}/MozBuild
 pushd ${srclib}/MozBuild
 git checkout ${MozBuild_commit}
 popd
@@ -147,7 +148,7 @@ popd
 git clone --depth=1 --branch ${MozAppServices_tag} https://github.com/mozilla/application-services.git ${srclib}/MozAppServices
 pushd ${srclib}/MozAppServices
 git submodule update --init --depth=1
-sed -i -e $'/^.*Build NSPR.*/i sed -i -e \'s/-O[0-3]/${CFLAGS} ${CFLAGS_TUNE}/g\' $(grep -lR -- -O[0-3])' libs/build-nss-android.sh
+# sed -i -e $'/^.*Build NSPR.*/i sed -i -e \'s/-O[0-3]/${CFLAGS} ${CFLAGS_TUNE}/g\' $(grep -lR -- -O[0-3])' libs/build-nss-android.sh
 popd
 
 # MozFennec
@@ -177,7 +178,7 @@ git clone --depth=1 --branch ${wasisdk_tag} https://github.com/WebAssembly/wasi-
 git clone https://git.savannah.gnu.org/git/config.git ${srclib}/wasi-sdk/src/config
 pushd ${srclib}/wasi-sdk
 git submodule update --init --depth=1
-sed -i -e 's/MinSizeRel/Release/g' Makefile
+# sed -i -e 's/MinSizeRel/Release/g' Makefile
 popd
 
 # Fenix
