@@ -1,10 +1,9 @@
 #!/bin/bash
 # Set default value
 arch_code=2;
-o_optimize_level=3;
 
 # Parse arguments
-VALID_ARGS=$(getopt -o a:o:p:t: --long arch:,optimize:,platform:,tune: -- "$@")
+VALID_ARGS=$(getopt -o a:t: --long arch:,tune: -- "$@")
 if [[ $? -ne 0 ]]; then
     exit 1;
 fi
@@ -16,30 +15,30 @@ while [ : ]; do
         export TARGET_ARCH_VARIANT=$2
         shift 2
         ;;
-    -p | --platform)
-        case $2 in
-            "armeabi-v7a" | "x86" | "x86_64")
-                echo "Platform $2 is not supported currently"
-                exit 1
-                ;;
-            "arm64-v8a")
-                arch_code=2
-                ;;
-            *)
-                echo "$2 is not recognized as a valid value for $1"
-                echo "Permitted values are armeabi-v7a, arm64-v8a, x86, x86_64"
-                exit 1
-                ;;
-        esac
-        shift 2
-        ;;
+    # -p | --platform)
+    #     case $2 in
+    #         "armeabi-v7a" | "x86" | "x86_64")
+    #             echo "Platform $2 is not supported currently"
+    #             exit 1
+    #             ;;
+    #         "arm64-v8a")
+    #             arch_code=2
+    #             ;;
+    #         *)
+    #             echo "$2 is not recognized as a valid value for $1"
+    #             echo "Permitted values are armeabi-v7a, arm64-v8a, x86, x86_64"
+    #             exit 1
+    #             ;;
+    #     esac
+    #     shift 2
+    #     ;;
     -t | --tune)
         export TARGET_CPU_VARIANT=$2
         shift 2
         ;;
     --)
-        shift; 
-        break 
+        shift;
+        break
         ;;
   esac
 done
