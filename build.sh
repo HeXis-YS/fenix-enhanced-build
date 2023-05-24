@@ -62,7 +62,7 @@ Fenix_code=${Fenix_version//./}${arch_code}${Fenix_revision}
 # Component version
 FirefoxAndroidAS_tag=components-v111.1.1
 MozAppServices_tag=v97.4.1
-MozBuild_commit=572df79bc00cc8b1ca3dd8d13582de9cf9f2e283
+MozBuild_commit=1441da8cdb1b2071a435ccc37945a160e204e90b
 MozFennec_tag=FIREFOX_113_0_RELEASE
 MozGlean_tag=v52.4.2
 MozGleanAS_tag=v52.2.0
@@ -107,6 +107,12 @@ yes | sdkmanager --licenses
 sdkmanager "ndk;r21d"
 sdkmanager "ndk;21.3.6528147"
 sdkmanager "platform-tools"
+sdkmanager 'build-tools;31.0.0'
+sdkmanager 'build-tools;33.0.0'
+sdkmanager 'build-tools;33.0.1'
+sdkmanager 'ndk;25.0.8775105' # for GleanAS
+sdkmanager 'ndk;25.1.8937393' # for Glean
+sdkmanager 'ndk;25.2.9519653'
 
 # MozBuild
 git clone -b wrapper --depth=1 https://github.com/HeXis-YS/fenixbuild.git ${srclib}/MozBuild
