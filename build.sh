@@ -61,7 +61,7 @@ Fenix_code=${Fenix_version//./}${arch_code}${Fenix_revision}
 # Component version
 FirefoxAndroidAS_tag=components-v111.1.1
 MozAppServices_tag=v97.4.1
-MozBuild_commit=1441da8cdb1b2071a435ccc37945a160e204e90b
+MozBuild_commit=4c274d2c0c459e8a09dde5a115cbf41333e3a89e
 MozFennec_tag=FIREFOX_113_0_RELEASE
 MozGlean_tag=v52.4.2
 MozGleanAS_tag=v52.2.0
@@ -71,7 +71,7 @@ wasisdk_tag=wasi-sdk-16
 # Set path
 export MOZBUILD_STATE_PATH=${workdir}/.mozbuild
 export ANDROID_SDK=/opt/android-sdk
-export ANDROID_NDK=/opt/android-sdk/ndk/${ndk}
+export ANDROID_NDK=/opt/android-sdk/ndk/r21d
 export ANDROID_HOME=${ANDROID_SDK}
 export ANDROID_SDK_ROOT=${ANDROID_SDK}
 export ANDROID_SDK_HOME=${ANDROID_SDK}
@@ -86,13 +86,19 @@ export GRADLE_OPTS="-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.g
 export RUSTFLAGS="-C opt-level=3 -C codegen-units=1 -C strip=symbols -C debuginfo=0 -C panic=abort"
 export CARGO_PROFILE_RELEASE_LTO=true
 export CARGO_PROFILE_DEBUG_LTO=true
+OVERWRITE_CFLAGS="-O3"
+if [ -n "${TARGET_ARCH_VARIANT}" ]
+then
+    OVERWRITE_CFLAGS="${OVERWRITE_CFLAGS} -march=${TARGET_ARCH_VARIANT}"
+fi
 if [ -n "${TARGET_CPU_VARIANT}" ]
 then
+    OVERWRITE_CFLAGS="${OVERWRITE_CFLAGS} -mtune=${TARGET_CPU_VARIANT}"
     export CARGO_TARGET_AARCH64_LINUX_ANDROID_RUSTFLAGS="-C target-cpu=${TARGET_CPU_VARIANT}"
 fi
 export OPT_LEVEL=3
 
-set -o posix ; set
+# set -o posix ; set
 
 sudo apt update
 sudo apt install -y cmake make m4 g++ pkg-config libssl-dev python-is-python3 python3-distutils python3-venv tcl gyp ninja-build bzip2 libz-dev libffi-dev libsqlite3-dev curl wget default-jdk-headless git sdkmanager zip unzip
@@ -103,15 +109,10 @@ sdk install gradle 7.5.1
 
 export ANDROID_SDK_ROOT=/opt/android-sdk
 yes | sdkmanager --licenses
-sdkmanager "ndk;r21d"
-sdkmanager "ndk;21.3.6528147"
-sdkmanager "platform-tools"
-sdkmanager 'build-tools;31.0.0'
-sdkmanager 'build-tools;33.0.0'
-sdkmanager 'build-tools;33.0.1'
-sdkmanager 'ndk;25.0.8775105' # for GleanAS
-sdkmanager 'ndk;25.1.8937393' # for Glean
-sdkmanager 'ndk;25.2.9519653'
+sdkmanager 'ndk;r21d' 'ndk;21.3.6528147' 'ndk;25.0.8775105' 'ndk;25.1.8937393' 'ndk;25.2.9519653' 'platform-tools' 'build-tools;31.0.0' 'build-tools;33.0.0' 'build-tools;33.0.1'
+#                                         for GleanAS        for Glean
+(rm -rf ~/.cache/sdkmanager/*.zip /tmp/.sdkmanager*) & # Delete sdkmanager temporary files
+find ${ANDROID_SDK}/ndk -type f -name "aarch64-*-clang*" -exec sed -i 's/"$@"/"$@" '"${OVERWRITE_CFLAGS}"'/g' {} \;
 
 # MozBuild
 git clone -b wrapper --depth=1 https://github.com/HeXis-YS/fenixbuild.git ${srclib}/MozBuild
