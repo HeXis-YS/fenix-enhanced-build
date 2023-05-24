@@ -16,19 +16,6 @@ while [ : ]; do
         export TARGET_ARCH_VARIANT=$2
         shift 2
         ;;
-    -o | --optimize)
-        case $2 in
-            "0" | "1" | "2" | "3")
-                o_optimize_level=$2
-                ;;
-            *)
-                echo "$2 is not recognized as a valid value for $1"
-                echo "Permitted values are 0, 1, 2, 3"
-                exit 1
-                ;;
-        esac
-        shift 2
-        ;;
     -p | --platform)
         case $2 in
             "armeabi-v7a" | "x86" | "x86_64")
@@ -65,9 +52,6 @@ else
     workdir=${GITHUB_WORKSPACE}/build
 fi
 srclib=${workdir}/srclib
-# export ANDROID_SDK_ROOT=/opt/android-sdk
-# ndk=$(sdkmanager --list | grep -o -P '(?<=ndk;)r[^-]*?(?=[ ]*\|)' | tail -1)
-ndk=r21d
 
 # Fenix version
 Fenix_version=113.0.0
@@ -100,19 +84,12 @@ export PATH=${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools
 # Optimization flags
 mkdir -p ~/.gradle && echo "org.gradle.daemon=false" >> ~/.gradle/gradle.properties
 export GRADLE_OPTS="-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.vfs.watch=true -Dorg.gradle.caching=true -Dorg.gradle.configureondemand=true"
-# export CFLAGS="-DNDEBUG -s -w -O${o_optimize_level} -pipe"
-# export CXXFLAGS=${CFLAGS}
 export RUSTFLAGS="-C opt-level=3 -C codegen-units=1 -C strip=symbols -C debuginfo=0 -C panic=abort"
 export CARGO_PROFILE_RELEASE_LTO=true
 export CARGO_PROFILE_DEBUG_LTO=true
-# if [ -n "${TARGET_ARCH_VARIANT}" ]
-# then
-#     export CFLAGS_TUNE="-march=${TARGET_ARCH_VARIANT}"
-# fi
 if [ -n "${TARGET_CPU_VARIANT}" ]
 then
     export CARGO_TARGET_AARCH64_LINUX_ANDROID_RUSTFLAGS="-C target-cpu=${TARGET_CPU_VARIANT}"
-    # export CFLAGS_TUNE="${CFLAGS_TUNE} -mtune=${TARGET_CPU_VARIANT}"
 fi
 export OPT_LEVEL=3
 
@@ -127,7 +104,7 @@ sdk install gradle 7.5.1
 
 export ANDROID_SDK_ROOT=/opt/android-sdk
 yes | sdkmanager --licenses
-sdkmanager "ndk;${ndk}"
+sdkmanager "ndk;r21d"
 sdkmanager "ndk;21.3.6528147"
 sdkmanager "platform-tools"
 
@@ -148,7 +125,6 @@ popd
 git clone --depth=1 --branch ${MozAppServices_tag} https://github.com/mozilla/application-services.git ${srclib}/MozAppServices
 pushd ${srclib}/MozAppServices
 git submodule update --init --depth=1
-# sed -i -e $'/^.*Build NSPR.*/i sed -i -e \'s/-O[0-3]/${CFLAGS} ${CFLAGS_TUNE}/g\' $(grep -lR -- -O[0-3])' libs/build-nss-android.sh
 popd
 
 # MozFennec
@@ -178,7 +154,6 @@ git clone --depth=1 --branch ${wasisdk_tag} https://github.com/WebAssembly/wasi-
 git clone https://git.savannah.gnu.org/git/config.git ${srclib}/wasi-sdk/src/config
 pushd ${srclib}/wasi-sdk
 git submodule update --init --depth=1
-# sed -i -e 's/MinSizeRel/Release/g' Makefile
 popd
 
 # Fenix
