@@ -4,28 +4,28 @@ arch_code=2;
 
 # Parse arguments
 VALID_ARGS=$(getopt -o a:t: --long arch:,tune: -- "$@")
-if [[ $? -ne 0 ]]; then
+if [[ ${?} -ne 0 ]]; then
     exit 1;
 fi
 
 eval set -- "$VALID_ARGS"
 while [ : ]; do
-  case "$1" in
+  case "${1}" in
     -a | --arch)
-        export TARGET_ARCH_VARIANT=$2
+        export TARGET_ARCH_VARIANT=${2}
         shift 2
         ;;
     # -p | --platform)
-    #     case $2 in
+    #     case ${2} in
     #         "armeabi-v7a" | "x86" | "x86_64")
-    #             echo "Platform $2 is not supported currently"
+    #             echo "Platform ${2} is not supported currently"
     #             exit 1
     #             ;;
     #         "arm64-v8a")
     #             arch_code=2
     #             ;;
     #         *)
-    #             echo "$2 is not recognized as a valid value for $1"
+    #             echo "${2} is not recognized as a valid value for ${1}"
     #             echo "Permitted values are armeabi-v7a, arm64-v8a, x86, x86_64"
     #             exit 1
     #             ;;
@@ -33,7 +33,7 @@ while [ : ]; do
     #     shift 2
     #     ;;
     -t | --tune)
-        export TARGET_CPU_VARIANT=$2
+        export TARGET_CPU_VARIANT=${2}
         shift 2
         ;;
     --)
@@ -46,7 +46,7 @@ done
 # Set base dir and ndk version
 if [ -z "${GITHUB_WORKSPACE}" ]
 then
-    workdir=$(pwd)/build
+    workdir=$(dirname ${0})/build
 else
     workdir=${GITHUB_WORKSPACE}/build
 fi
@@ -86,6 +86,7 @@ export GRADLE_OPTS="-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.g
 export RUSTFLAGS="-C opt-level=3 -C codegen-units=1 -C strip=symbols -C debuginfo=0 -C panic=abort"
 export CARGO_PROFILE_RELEASE_LTO=true
 export CARGO_PROFILE_DEBUG_LTO=true
+export OPT_LEVEL=3
 OVERWRITE_CFLAGS="-O3"
 if [ -n "${TARGET_ARCH_VARIANT}" ]
 then
@@ -93,18 +94,17 @@ then
 fi
 if [ -n "${TARGET_CPU_VARIANT}" ]
 then
-    OVERWRITE_CFLAGS="${OVERWRITE_CFLAGS} -mtune=${TARGET_CPU_VARIANT}"
+    OVERWRITE_CFLAGS="${OVERWRITE_CFLAGS} -mcpu=${TARGET_CPU_VARIANT} -mtune=${TARGET_CPU_VARIANT}"
     export CARGO_TARGET_AARCH64_LINUX_ANDROID_RUSTFLAGS="-C target-cpu=${TARGET_CPU_VARIANT}"
 fi
-export OPT_LEVEL=3
 
 # set -o posix ; set
 
 sudo apt update
 sudo apt install -y cmake make m4 g++ pkg-config libssl-dev python-is-python3 python3-distutils python3-venv tcl gyp ninja-build bzip2 libz-dev libffi-dev libsqlite3-dev curl wget default-jdk-headless git sdkmanager zip unzip
 curl -s "https://get.sdkman.io" | bash
-export SDKMAN_DIR="$HOME/.sdkman"
-[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+export SDKMAN_DIR="${HOME}/.sdkman"
+[[ -s "${HOME}/.sdkman/bin/sdkman-init.sh" ]] && source "${HOME}/.sdkman/bin/sdkman-init.sh"
 sdk install gradle 7.5.1
 
 export ANDROID_SDK_ROOT=/opt/android-sdk
@@ -114,7 +114,25 @@ sdkmanager 'ndk;21.3.6528147' 'ndk;25.0.8775105' 'ndk;25.1.8937393' 'ndk;25.2.95
 (rm -rf ~/.cache/sdkmanager/*.zip /tmp/.sdkmanager*) & # Delete sdkmanager temporary files
 pushd ${ANDROID_SDK_ROOT}/ndk
 ln -s 21.3.6528147 r21d
+ln -s 25.0.8775105 r25
+ln -s 25.1.8937393 r25b
+ln -s 25.2.9519653 r25c
 popd
+replace_files=(
+    "${ANDROID_SDK}/ndk/21.3.6528147/toolchains/llvm/prebuilt/linux-x86_64/bin/clang" \
+    "${ANDROID_SDK}/ndk/21.3.6528147/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++" \
+    "${ANDROID_SDK}/ndk/25.0.8775105/toolchains/llvm/prebuilt/linux-x86_64/bin/clang-14" \
+    "${ANDROID_SDK}/ndk/25.1.8937393/toolchains/llvm/prebuilt/linux-x86_64/bin/clang-14" \
+    "${ANDROID_SDK}/ndk/25.2.9519653/toolchains/llvm/prebuilt/linux-x86_64/bin/clang-14")
+
+for file in ${replace_files[@]}; do
+    DIR=$(dirname "${file}")
+    BASENAME=$(basename "${file}")
+    mv ${file} ${DIR}/_${BASENAME}
+    cp $(dirname ${0})/ndk-wrapper.sh ${file}
+    sed -i -e "s|@COMPILER_EXE@|_${BASENAME}|g" -e "s|@OVERWRITE_CFLAGS@|${OVERWRITE_CFLAGS}|g" ${file}
+    chmod 755 ${file}
+done
 
 
 # MozBuild
