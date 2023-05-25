@@ -61,7 +61,7 @@ Fenix_code=${Fenix_version//./}${arch_code}${Fenix_revision}
 # Component version
 FirefoxAndroidAS_tag=components-v111.1.1
 MozAppServices_tag=v97.4.1
-MozBuild_commit=4c274d2c0c459e8a09dde5a115cbf41333e3a89e
+MozBuild_commit=b7cf3e89683d8f56b99d692e0d9c4a41240c5661
 MozFennec_tag=FIREFOX_113_0_RELEASE
 MozGlean_tag=v52.4.2
 MozGleanAS_tag=v52.2.0
