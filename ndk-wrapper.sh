@@ -1,9 +1,9 @@
 #!/bin/bash
-USE_OVERWRITE_CFLAGS=1
-for param in "${@}"; do
-    if [[ ${param} = "--target=*" ]]; then
+USE_OVERWRITE_CFLAGS=0
+for arg in "${@}"; do
+    if [[ ${arg} = --target=* ]]; then
         USE_OVERWRITE_CFLAGS=1
-        if [[ ${param} != "--target=aarch64*" ]]; then
+        if [[ ${arg} != --target=aarch64* ]]; then
             USE_OVERWRITE_CFLAGS=0
         fi
     fi

@@ -46,7 +46,7 @@ done
 # Set base dir and ndk version
 if [ -z "${GITHUB_WORKSPACE}" ]
 then
-    workdir=$(dirname ${0})/build
+    workdir=$(pwd)/build
 else
     workdir=${GITHUB_WORKSPACE}/build
 fi
