@@ -109,10 +109,13 @@ sdk install gradle 7.5.1
 
 export ANDROID_SDK_ROOT=/opt/android-sdk
 yes | sdkmanager --licenses
-sdkmanager 'ndk;r21d' 'ndk;21.3.6528147' 'ndk;25.0.8775105' 'ndk;25.1.8937393' 'ndk;25.2.9519653' 'platform-tools' 'build-tools;31.0.0' 'build-tools;33.0.0' 'build-tools;33.0.1'
-#                                         for GleanAS        for Glean
+sdkmanager 'ndk;21.3.6528147' 'ndk;25.0.8775105' 'ndk;25.1.8937393' 'ndk;25.2.9519653' 'platform-tools' 'build-tools;31.0.0' 'build-tools;33.0.0' 'build-tools;33.0.1'
+#                              for GleanAS        for Glean
 (rm -rf ~/.cache/sdkmanager/*.zip /tmp/.sdkmanager*) & # Delete sdkmanager temporary files
-find ${ANDROID_SDK}/ndk -type f -name "aarch64-*-clang*" -exec sed -i 's/"$@"/"$@" '"${OVERWRITE_CFLAGS}"'/g' {} \;
+pushd ${ANDROID_SDK_ROOT}/ndk
+ln -s 21.3.6528147 r21d
+popd
+
 
 # MozBuild
 git clone -b wrapper --depth=1 https://github.com/HeXis-YS/fenixbuild.git ${srclib}/MozBuild
