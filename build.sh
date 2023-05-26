@@ -109,21 +109,21 @@ sdk install gradle 7.5.1
 
 export ANDROID_SDK_ROOT=/opt/android-sdk
 yes | sdkmanager --licenses
-sdkmanager 'ndk;21.3.6528147' 'ndk;25.0.8775105' 'ndk;25.1.8937393' 'ndk;25.2.9519653' 'platform-tools' 'build-tools;31.0.0' 'build-tools;33.0.0' 'build-tools;33.0.1'
-#                              for GleanAS        for Glean
+sdkmanager 'ndk;r21d' 'ndk;r25' 'ndk;r25b' 'ndk;r25c' 'platform-tools' 'build-tools;31.0.0' 'build-tools;33.0.0' 'build-tools;33.0.1'
+#                      GleanAS   Glean
 (rm -rf ~/.cache/sdkmanager/*.zip /tmp/.sdkmanager*) & # Delete sdkmanager temporary files
 pushd ${ANDROID_SDK_ROOT}/ndk
-ln -s 21.3.6528147 r21d
-ln -s 25.0.8775105 r25
-ln -s 25.1.8937393 r25b
-ln -s 25.2.9519653 r25c
+ln -s r21d 21.3.6528147
+ln -s r25  25.0.8775105
+ln -s r25b 25.1.8937393
+ln -s r25c 25.2.9519653
 popd
 replace_files=(
-    "${ANDROID_SDK}/ndk/21.3.6528147/toolchains/llvm/prebuilt/linux-x86_64/bin/clang" \
-    "${ANDROID_SDK}/ndk/21.3.6528147/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++" \
-    "${ANDROID_SDK}/ndk/25.0.8775105/toolchains/llvm/prebuilt/linux-x86_64/bin/clang-14" \
-    "${ANDROID_SDK}/ndk/25.1.8937393/toolchains/llvm/prebuilt/linux-x86_64/bin/clang-14" \
-    "${ANDROID_SDK}/ndk/25.2.9519653/toolchains/llvm/prebuilt/linux-x86_64/bin/clang-14")
+    "${ANDROID_SDK}/ndk/r21d/toolchains/llvm/prebuilt/linux-x86_64/bin/clang" \
+    "${ANDROID_SDK}/ndk/r21d/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++" \
+    "${ANDROID_SDK}/ndk/r25/toolchains/llvm/prebuilt/linux-x86_64/bin/clang-14" \
+    "${ANDROID_SDK}/ndk/r25b/toolchains/llvm/prebuilt/linux-x86_64/bin/clang-14" \
+    "${ANDROID_SDK}/ndk/r25c/toolchains/llvm/prebuilt/linux-x86_64/bin/clang-14")
 
 for file in ${replace_files[@]}; do
     DIR=$(dirname "${file}")
