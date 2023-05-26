@@ -1,9 +1,10 @@
 #!/bin/bash
 # Set default value
 arch_code=2;
+TARGET_CPU_VARIANT="cortex-a55"
 
 # Parse arguments
-VALID_ARGS=$(getopt -o a:t: --long arch:,tune: -- "$@")
+VALID_ARGS=$(getopt -o t: --long tune: -- "$@")
 if [[ ${?} -ne 0 ]]; then
     exit 1;
 fi
@@ -11,10 +12,10 @@ fi
 eval set -- "$VALID_ARGS"
 while [ : ]; do
   case "${1}" in
-    -a | --arch)
-        export TARGET_ARCH_VARIANT=${2}
-        shift 2
-        ;;
+    # -a | --arch)
+    #     export TARGET_ARCH_VARIANT=${2}
+    #     shift 2
+    #     ;;
     # -p | --platform)
     #     case ${2} in
     #         "armeabi-v7a" | "x86" | "x86_64")
@@ -88,12 +89,10 @@ export CARGO_PROFILE_RELEASE_LTO=true
 export CARGO_PROFILE_DEBUG_LTO=true
 export OPT_LEVEL=3
 OVERWRITE_CFLAGS="-O3"
-if [ -n "${TARGET_ARCH_VARIANT}" ]
-then
-    OVERWRITE_CFLAGS="${OVERWRITE_CFLAGS} -march=${TARGET_ARCH_VARIANT}"
-fi
-if [ -n "${TARGET_CPU_VARIANT}" ]
-then
+# if [ -n "${TARGET_ARCH_VARIANT}" ]; then
+#     OVERWRITE_CFLAGS="${OVERWRITE_CFLAGS} -march=${TARGET_ARCH_VARIANT}"
+# fi
+if [ -n "${TARGET_CPU_VARIANT}" ]; then
     OVERWRITE_CFLAGS="${OVERWRITE_CFLAGS} -mcpu=${TARGET_CPU_VARIANT} -mtune=${TARGET_CPU_VARIANT}"
     export CARGO_TARGET_AARCH64_LINUX_ANDROID_RUSTFLAGS="-C target-cpu=${TARGET_CPU_VARIANT}"
 fi
