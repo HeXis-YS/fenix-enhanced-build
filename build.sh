@@ -54,18 +54,18 @@ fi
 srclib=${workdir}/srclib
 
 # Fenix version
-Fenix_version=113.0.0
-Fenix_tag=fenix-v113.0
+Fenix_version=114.0.0
+Fenix_tag=fenix-v114.0
 Fenix_revision=0
 Fenix_code=${Fenix_version//./}${arch_code}${Fenix_revision}
 
 # Component version
-FirefoxAndroidAS_tag=components-v111.1.1
-MozAppServices_tag=v97.4.1
-MozBuild_commit=b7cf3e89683d8f56b99d692e0d9c4a41240c5661
-MozFennec_tag=FIREFOX_113_0_RELEASE
-MozGlean_tag=v52.4.2
-MozGleanAS_tag=v52.2.0
+FirefoxAndroidAS_tag=components-v112.2.0
+MozAppServices_tag=v114.1
+MozBuild_commit=ac484e39fa24c43cf805d8e19c9cdd18c2914f59
+MozFennec_tag=FIREFOX_114_0_RELEASE
+MozGlean_tag=v52.7.0
+MozGleanAS_tag=v52.6.0
 rustup_tag=1.26.0
 wasisdk_tag=wasi-sdk-16
 
