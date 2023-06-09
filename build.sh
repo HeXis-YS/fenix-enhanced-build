@@ -45,11 +45,10 @@ while [ : ]; do
 done
 
 # Set base dir and ndk version
-if [ -z "${GITHUB_WORKSPACE}" ]
-then
-    workdir=$(pwd)/build
-else
+if [ -n "${GITHUB_WORKSPACE}" ]; then
     workdir=${GITHUB_WORKSPACE}/build
+else
+    workdir=$(realpath $(dirname ${0}))/build
 fi
 srclib=${workdir}/srclib
 
