@@ -146,22 +146,31 @@ if [[ ${BUILD_DEP} -eq 1 ]]; then
     wget -O- https://github.com/llvm/llvm-project/releases/download/llvmorg-16.0.4/clang+llvm-16.0.4-x86_64-linux-gnu-ubuntu-22.04.tar.xz | tar -xJf -
     mv clang+llvm-16.0.4-x86_64-linux-gnu-ubuntu-22.04 llvm-16
     popd
+    ndk_versions=("r21d" "r25" "r25b" "r25c")
+    for ndk in ${ndk_versions[@]}; do
+        pushd "${ANDROID_SDK}/ndk/${ndk}/toolchains/llvm/prebuilt/linux-x86_64/bin"
+        for file in "${workdir}/llvm-16/bin"/*; do
+            ln -sf "${file}" "$(basename "${file}")"
+        done
+        sed -i -e "s|\$bin_dir/clang|\$bin_dir/wrapper/clang|g" *-linux-android*-clang*
+        mkdir -p wrapper
+        popd
+    done
     replace_files=(
-        "${ANDROID_SDK}/ndk/r21d/toolchains/llvm/prebuilt/linux-x86_64/bin/clang" \
-        "${ANDROID_SDK}/ndk/r21d/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++" \
-        "${ANDROID_SDK}/ndk/r25/toolchains/llvm/prebuilt/linux-x86_64/bin/clang" \
-        "${ANDROID_SDK}/ndk/r25/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++" \
-        "${ANDROID_SDK}/ndk/r25b/toolchains/llvm/prebuilt/linux-x86_64/bin/clang" \
-        "${ANDROID_SDK}/ndk/r25b/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++" \
-        "${ANDROID_SDK}/ndk/r25c/toolchains/llvm/prebuilt/linux-x86_64/bin/clang" \
-        "${ANDROID_SDK}/ndk/r25c/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++")
+        "${ANDROID_SDK}/ndk/r21d/toolchains/llvm/prebuilt/linux-x86_64/bin/wrapper/clang" \
+        "${ANDROID_SDK}/ndk/r21d/toolchains/llvm/prebuilt/linux-x86_64/bin/wrapper/clang++" \
+        "${ANDROID_SDK}/ndk/r25/toolchains/llvm/prebuilt/linux-x86_64/bin/wrapper/clang" \
+        "${ANDROID_SDK}/ndk/r25/toolchains/llvm/prebuilt/linux-x86_64/bin/wrapper/clang++" \
+        "${ANDROID_SDK}/ndk/r25b/toolchains/llvm/prebuilt/linux-x86_64/bin/wrapper/clang" \
+        "${ANDROID_SDK}/ndk/r25b/toolchains/llvm/prebuilt/linux-x86_64/bin/wrapper/clang++" \
+        "${ANDROID_SDK}/ndk/r25c/toolchains/llvm/prebuilt/linux-x86_64/bin/wrapper/clang" \
+        "${ANDROID_SDK}/ndk/r25c/toolchains/llvm/prebuilt/linux-x86_64/bin/wrapper/clang++")
 
     for file in ${replace_files[@]}; do
-        DIR=$(dirname "${file}")
+        DIR=$(dirname $(dirname "${file}"))
         BASENAME=$(basename "${file}")
-        mv ${file} ${file}_
         cp $(dirname ${0})/ndk-wrapper.sh ${file}
-        sed -i -e "s|@COMPILER_EXE@|${workdir}/llvm-16/bin/${BASENAME}|g" -e "s|@OVERWRITE_CFLAGS@|${OVERWRITE_CFLAGS}|g" ${file}
+        sed -i -e "s|@COMPILER_EXE@|${DIR}/${BASENAME}|g" -e "s|@OVERWRITE_CFLAGS@|${OVERWRITE_CFLAGS}|g" ${file}
         chmod 755 ${file}
     done
 fi
