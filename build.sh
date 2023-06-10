@@ -5,48 +5,48 @@ TARGET_CPU_VARIANT="cortex-a55"
 USE_HG=0
 
 # Parse arguments
-VALID_ARGS=$(getopt -o t: -l tune:,use-hg -- "$@")
+VALID_ARGS=$(getopt -o t: -l tune:,use-hg -- "${@}")
 if [[ ${?} -ne 0 ]]; then
     exit 1;
 fi
 
 eval set -- "$VALID_ARGS"
 while [ : ]; do
-  case "${1}" in
-    # -a | --arch)
-    #     export TARGET_ARCH_VARIANT=${2}
-    #     shift 2
-    #     ;;
-    # -p | --platform)
-    #     case ${2} in
-    #         "armeabi-v7a" | "x86" | "x86_64")
-    #             echo "Platform ${2} is not supported currently"
-    #             exit 1
-    #             ;;
-    #         "arm64-v8a")
-    #             arch_code=2
-    #             ;;
-    #         *)
-    #             echo "${2} is not recognized as a valid value for ${1}"
-    #             echo "Permitted values are armeabi-v7a, arm64-v8a, x86, x86_64"
-    #             exit 1
-    #             ;;
-    #     esac
-    #     shift 2
-    #     ;;
-    -t | --tune)
-        export TARGET_CPU_VARIANT=${2}
-        shift 2
-        ;;
-    --use-hg)
-        USE_HG=1
-        shift
-        ;;
-    --)
-        shift
-        break
-        ;;
-  esac
+    case "${1}" in
+        # -a | --arch)
+        #     export TARGET_ARCH_VARIANT=${2}
+        #     shift 2
+        #     ;;
+        # -p | --platform)
+        #     case ${2} in
+        #         "armeabi-v7a" | "x86" | "x86_64")
+        #             echo "Platform ${2} is not supported currently"
+        #             exit 1
+        #             ;;
+        #         "arm64-v8a")
+        #             arch_code=2
+        #             ;;
+        #         *)
+        #             echo "${2} is not recognized as a valid value for ${1}"
+        #             echo "Permitted values are armeabi-v7a, arm64-v8a, x86, x86_64"
+        #             exit 1
+        #             ;;
+        #     esac
+        #     shift 2
+        #     ;;
+        -t | --tune)
+            TARGET_CPU_VARIANT=${2}
+            shift 2
+            ;;
+        --use-hg)
+            USE_HG=1
+            shift
+            ;;
+        --)
+            shift
+            break
+            ;;
+    esac
 done
 
 # Set base dir and ndk version
@@ -158,7 +158,6 @@ git submodule update --init --depth=1
 popd
 
 # MozFennec
-# MozFennec
 if [[ ${USE_HG} -eq 1 ]]; then
     python3 -m pip install --user --upgrade mercurial
     hg clone --stream https://hg.mozilla.org/releases/mozilla-release/ ${srclib}/MozFennec
@@ -177,12 +176,12 @@ fi
 
 # MozGlean
 git clone --depth=1 --branch ${MozGlean_tag} https://github.com/mozilla/glean.git ${srclib}/MozGlean
-if [ ${MozGlean_tag} == ${MozGleanAS_tag} ]; then
+if [[ ${MozGlean_tag} == ${MozGleanAS_tag} ]]; then
     cp -r ${srclib}/MozGlean ${srclib}/MozGleanAS
 fi
 
 # MozGleanAS
-if [ ${MozGlean_tag} != ${MozGleanAS_tag} ]; then
+if [[ ${MozGlean_tag} != ${MozGleanAS_tag} ]]; then
     git clone --depth=1 --branch ${MozGleanAS_tag} https://github.com/mozilla/glean.git ${srclib}/MozGleanAS
 fi
 
