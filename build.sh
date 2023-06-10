@@ -71,6 +71,7 @@ else
     workdir=$(realpath $(dirname ${0}))/build
 fi
 srclib=${workdir}/srclib
+mkdir -p ${srclib}
 
 # Fenix version
 Fenix_version=114.0.0
