@@ -2,9 +2,10 @@
 # Set default value
 arch_code=2;
 TARGET_CPU_VARIANT="cortex-a55"
+USE_HG=0
 
 # Parse arguments
-VALID_ARGS=$(getopt -o t: --long tune: -- "$@")
+VALID_ARGS=$(getopt -o t: -l tune:,use-hg -- "$@")
 if [[ ${?} -ne 0 ]]; then
     exit 1;
 fi
@@ -37,8 +38,12 @@ while [ : ]; do
         export TARGET_CPU_VARIANT=${2}
         shift 2
         ;;
+    --use-hg)
+        USE_HG=1
+        shift
+        ;;
     --)
-        shift;
+        shift
         break
         ;;
   esac
@@ -153,12 +158,22 @@ git submodule update --init --depth=1
 popd
 
 # MozFennec
-pushd ${srclib}
-wget --progress=bar:force:noscroll -O MozFennec.zip https://hg.mozilla.org/releases/mozilla-release/archive/${MozFennec_tag}.zip
-unzip -o -q MozFennec.zip
-rm MozFennec.zip
-mv mozilla-release-${MozFennec_tag} MozFennec
-popd
+# MozFennec
+if [[ ${USE_HG} -eq 1 ]]; then
+    python3 -m pip install --user --upgrade mercurial
+    hg clone --stream https://hg.mozilla.org/releases/mozilla-release/ ${srclib}/MozFennec
+    pushd ${srclib}/MozFennec
+    hg checkout ${MozFennec_tag}
+    popd
+else
+    pushd ${srclib}
+    wget --progress=bar:force:noscroll -O MozFennec.zip https://hg.mozilla.org/releases/mozilla-release/archive/${MozFennec_tag}.zip
+    unzip -o -q MozFennec.zip
+    rm MozFennec.zip
+    mv mozilla-release-${MozFennec_tag} MozFennec
+    popd
+fi
+
 
 # MozGlean
 git clone --depth=1 --branch ${MozGlean_tag} https://github.com/mozilla/glean.git ${srclib}/MozGlean
