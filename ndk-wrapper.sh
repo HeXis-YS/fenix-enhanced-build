@@ -8,7 +8,7 @@ for arg in "${@}"; do
         if [[ ${arg} != --target=aarch64* ]]; then
             USE_OVERWRITE_CFLAGS=0
         fi
-    elif [[ $arg == -march* ]]; then
+    elif [[ $arg == -march=* ]]; then
         continue
     fi
     new_args+=("$arg")

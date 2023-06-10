@@ -133,26 +133,34 @@ if [[ ${BUILD_DEP} -eq 1 ]]; then
     yes | sdkmanager --licenses
     sdkmanager 'ndk;r21d' 'ndk;r25' 'ndk;r25b' 'ndk;r25c' 'platform-tools' 'build-tools;31.0.0' 'build-tools;33.0.0' 'build-tools;33.0.1'
     #                      GleanAS   Glean
-    (rm -rf ~/.cache/sdkmanager/*.zip /tmp/.sdkmanager*) & # Delete sdkmanager temporary files
+    rm -rf ~/.cache/sdkmanager/*.zip /tmp/.sdkmanager*  # Delete sdkmanager temporary files
     pushd ${ANDROID_SDK_ROOT}/ndk
     ln -s r21d 21.3.6528147
     ln -s r25  25.0.8775105
     ln -s r25b 25.1.8937393
     ln -s r25c 25.2.9519653
     popd
+
+    pushd ${workdir}
+    wget -O- https://github.com/llvm/llvm-project/releases/download/llvmorg-16.0.4/clang+llvm-16.0.4-x86_64-linux-gnu-ubuntu-22.04.tar.xz | tar -xJf -
+    mv clang+llvm-16.0.4-x86_64-linux-gnu-ubuntu-22.04 llvm-16
+    popd
     replace_files=(
         "${ANDROID_SDK}/ndk/r21d/toolchains/llvm/prebuilt/linux-x86_64/bin/clang" \
         "${ANDROID_SDK}/ndk/r21d/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++" \
-        "${ANDROID_SDK}/ndk/r25/toolchains/llvm/prebuilt/linux-x86_64/bin/clang-14" \
-        "${ANDROID_SDK}/ndk/r25b/toolchains/llvm/prebuilt/linux-x86_64/bin/clang-14" \
-        "${ANDROID_SDK}/ndk/r25c/toolchains/llvm/prebuilt/linux-x86_64/bin/clang-14")
+        "${ANDROID_SDK}/ndk/r25/toolchains/llvm/prebuilt/linux-x86_64/bin/clang" \
+        "${ANDROID_SDK}/ndk/r25/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++" \
+        "${ANDROID_SDK}/ndk/r25b/toolchains/llvm/prebuilt/linux-x86_64/bin/clang" \
+        "${ANDROID_SDK}/ndk/r25b/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++" \
+        "${ANDROID_SDK}/ndk/r25c/toolchains/llvm/prebuilt/linux-x86_64/bin/clang" \
+        "${ANDROID_SDK}/ndk/r25c/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++")
 
     for file in ${replace_files[@]}; do
         DIR=$(dirname "${file}")
         BASENAME=$(basename "${file}")
-        mv ${file} ${DIR}/_${BASENAME}
+        mv ${file} ${file}_
         cp $(dirname ${0})/ndk-wrapper.sh ${file}
-        sed -i -e "s|@COMPILER_EXE@|_${BASENAME}|g" -e "s|@OVERWRITE_CFLAGS@|${OVERWRITE_CFLAGS}|g" ${file}
+        sed -i -e "s|@COMPILER_EXE@|${workdir}/llvm-16/bin/${BASENAME}|g" -e "s|@OVERWRITE_CFLAGS@|${OVERWRITE_CFLAGS}|g" ${file}
         chmod 755 ${file}
     done
 fi
