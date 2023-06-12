@@ -15,7 +15,7 @@ for arg in "${@}"; do
 done
 
 if [[ ${USE_OVERWRITE_CFLAGS} -eq 1 ]]; then
-    "@COMPILER_EXE@" "${new_args[@]}" ${OVERWRITE_CFLAGS}
+    `dirname ${0}`/../@COMPILER_EXE@ "${new_args[@]}" ${OVERWRITE_CFLAGS}
 else
-    "@COMPILER_EXE@" "${@}"
+    `dirname ${0}`/../@COMPILER_EXE@ "${@}"
 fi
