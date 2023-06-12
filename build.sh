@@ -122,7 +122,7 @@ fi
 
 if [[ ${BUILD_DEP} -eq 1 ]]; then
     sudo apt update
-    sudo apt install -y cmake make m4 g++ pkg-config libssl-dev python-is-python3 python3-distutils python3-venv tcl gyp ninja-build bzip2 libz-dev libffi-dev libsqlite3-dev curl wget default-jdk-headless git sdkmanager zip unzip
+    sudo apt install -y cmake make m4 g++ pkg-config libssl-dev python-is-python3 python3-distutils python3-venv tcl gyp ninja-build bzip2 libz-dev libffi-dev libsqlite3-dev curl wget default-jdk-headless git sdkmanager zip unzip rsync
     curl -s "https://get.sdkman.io" | bash
 fi
 
@@ -148,7 +148,7 @@ if [[ ${BUILD_DEP} -eq 1 ]]; then
         pushd "${ANDROID_SDK}/ndk/${ndk}/toolchains/llvm/prebuilt/linux-x86_64"
         xargs -a "${REPO_DIR}/filelist/${ndk}.txt" -I{} rm -f "{}"
         find . -type d -empty -delete
-        rsync -a "${WORK_DIR}/llvm-prebuilts/clang-r475365b" ./
+        rsync -a "${WORK_DIR}/llvm-prebuilts/clang-r475365b/" ./
 
         pushd bin
         sed -i -e "s|/clang|/wrapper/clang|g" *-linux-android*-clang*
