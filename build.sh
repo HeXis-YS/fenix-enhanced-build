@@ -65,13 +65,14 @@ while [ : ]; do
 done
 
 # Set base dir and ndk version
+REPO_DIR=$(realpath $(dirname ${0}))
 if [[ -n "${GITHUB_WORKSPACE}" ]]; then
-    workdir=${GITHUB_WORKSPACE}/build
+    WORK_DIR=${GITHUB_WORKSPACE}/build
 else
-    workdir=$(realpath $(dirname ${0}))/build
+    WORK_DIR=${REPO_DIR}/build
 fi
-srclib=${workdir}/srclib
-mkdir -p ${srclib}
+SRCLIB=${WORK_DIR}/srclib
+mkdir -p ${SRCLIB}
 
 # Fenix version
 Fenix_version=114.0.0
@@ -90,7 +91,7 @@ rustup_tag=1.26.0
 wasisdk_tag=wasi-sdk-16
 
 # Set path
-export MOZBUILD_STATE_PATH=${workdir}/.mozbuild
+export MOZBUILD_STATE_PATH=${WORK_DIR}/.mozbuild
 export ANDROID_SDK=/opt/android-sdk
 export ANDROID_NDK=/opt/android-sdk/ndk/r21d
 export ANDROID_HOME=${ANDROID_SDK}
@@ -142,56 +143,56 @@ if [[ ${BUILD_DEP} -eq 1 ]]; then
     ln -s r25c 25.2.9519653
     popd
 
-    git clone -b ndk-r26-release --depth=1 https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86 "${workdir}/llvm-prebuilts"
-    for ndk in ("r21d" "r25" "r25b" "r25c"); do
+    git clone -b ndk-r26-release --depth=1 https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86 "${WORK_DIR}/llvm-prebuilts"
+    for ndk in "r21d" "r25" "r25b" "r25c"; do
         pushd "${ANDROID_SDK}/ndk/${ndk}/toolchains/llvm/prebuilt/linux-x86_64"
-        xargs -a "$(dirname ${0})/filelist/${ndk}.txt" -I{} rm -f "{}"
+        xargs -a "${REPO_DIR}/filelist/${ndk}.txt" -I{} rm -f "{}"
         find . -type d -empty -delete
-        rsync -a "${workdir}/llvm-prebuilts/clang-r475365b" ./
+        rsync -a "${WORK_DIR}/llvm-prebuilts/clang-r475365b" ./
 
         pushd bin
         sed -i -e "s|/clang|/wrapper/clang|g" *-linux-android*-clang*
         mkdir -p wrapper
-        for file in ("clang" "clang++"); do
-            cp $(dirname ${0})/ndk-wrapper.sh wrapper/${file}
+        for file in "clang" "clang++"; do
+            cp "${REPO_DIR}/ndk-wrapper.sh" wrapper/${file}
             sed -i -e "s|@COMPILER_EXE@|${file}|g" -e "s|@OVERWRITE_CFLAGS@|${OVERWRITE_CFLAGS}|g" wrapper/${file}
         done
         chmod 755 wrapper/*
         popd
         popd
     done
-    rm -rf "${workdir}/llvm-prebuilts"
+    rm -rf "${WORK_DIR}/llvm-prebuilts"
 fi
 
 if [[ ${SOURCE} -eq 1 ]]; then
     # MozBuild
-    git clone -b wrapper --depth=1 https://github.com/HeXis-YS/fenixbuild.git ${srclib}/MozBuild
-    pushd ${srclib}/MozBuild
+    git clone -b wrapper --depth=1 https://github.com/HeXis-YS/fenixbuild.git ${SRCLIB}/MozBuild
+    pushd ${SRCLIB}/MozBuild
     git checkout ${MozBuild_commit}
     popd
 
     # FirefoxAndroidAS
-    git clone --depth=1 --branch ${FirefoxAndroidAS_tag} https://github.com/mozilla-mobile/firefox-android.git ${srclib}/FirefoxAndroidAS
-    pushd ${srclib}/FirefoxAndroidAS
+    git clone --depth=1 --branch ${FirefoxAndroidAS_tag} https://github.com/mozilla-mobile/firefox-android.git ${SRCLIB}/FirefoxAndroidAS
+    pushd ${SRCLIB}/FirefoxAndroidAS
     sed -i -e '/com.google.firebase/d' android-components/plugins/dependencies/src/main/java/DependenciesPlugin.kt || sed -i -e '/com.google.firebase/d' android-components/buildSrc/src/main/java/Dependencies.kt
     rm -R android-components/components/lib/push-firebase
     popd
 
     # MozAppServices
-    git clone --depth=1 --branch ${MozAppServices_tag} https://github.com/mozilla/application-services.git ${srclib}/MozAppServices
-    pushd ${srclib}/MozAppServices
+    git clone --depth=1 --branch ${MozAppServices_tag} https://github.com/mozilla/application-services.git ${SRCLIB}/MozAppServices
+    pushd ${SRCLIB}/MozAppServices
     git submodule update --init --depth=1
     popd
 
     # MozFennec
     if [[ ${USE_HG} -eq 1 ]]; then
         python3 -m pip install --user --upgrade mercurial
-        hg clone --stream https://hg.mozilla.org/releases/mozilla-release/ ${srclib}/MozFennec
-        pushd ${srclib}/MozFennec
+        hg clone --stream https://hg.mozilla.org/releases/mozilla-release/ ${SRCLIB}/MozFennec
+        pushd ${SRCLIB}/MozFennec
         hg checkout ${MozFennec_tag}
         popd
     else
-        pushd ${srclib}
+        pushd ${SRCLIB}
         wget --progress=bar:force:noscroll -O MozFennec.zip https://hg.mozilla.org/releases/mozilla-release/archive/${MozFennec_tag}.zip
         unzip -o -q MozFennec.zip
         rm MozFennec.zip
@@ -201,53 +202,53 @@ if [[ ${SOURCE} -eq 1 ]]; then
 
 
     # MozGlean
-    git clone --depth=1 --branch ${MozGlean_tag} https://github.com/mozilla/glean.git ${srclib}/MozGlean
+    git clone --depth=1 --branch ${MozGlean_tag} https://github.com/mozilla/glean.git ${SRCLIB}/MozGlean
     if [[ ${MozGlean_tag} == ${MozGleanAS_tag} ]]; then
-        cp -r ${srclib}/MozGlean ${srclib}/MozGleanAS
+        cp -r ${SRCLIB}/MozGlean ${SRCLIB}/MozGleanAS
     fi
 
     # MozGleanAS
     if [[ ${MozGlean_tag} != ${MozGleanAS_tag} ]]; then
-        git clone --depth=1 --branch ${MozGleanAS_tag} https://github.com/mozilla/glean.git ${srclib}/MozGleanAS
+        git clone --depth=1 --branch ${MozGleanAS_tag} https://github.com/mozilla/glean.git ${SRCLIB}/MozGleanAS
     fi
 
     # rustup
-    git clone --depth=1 --branch ${rustup_tag} https://github.com/rust-lang/rustup ${srclib}/rustup
+    git clone --depth=1 --branch ${rustup_tag} https://github.com/rust-lang/rustup ${SRCLIB}/rustup
 
     # wasi-sdk
-    git clone --depth=1 --branch ${wasisdk_tag} https://github.com/WebAssembly/wasi-sdk.git ${srclib}/wasi-sdk
-    git clone https://git.savannah.gnu.org/git/config.git ${srclib}/wasi-sdk/src/config
-    pushd ${srclib}/wasi-sdk
+    git clone --depth=1 --branch ${wasisdk_tag} https://github.com/WebAssembly/wasi-sdk.git ${SRCLIB}/wasi-sdk
+    git clone https://git.savannah.gnu.org/git/config.git ${SRCLIB}/wasi-sdk/src/config
+    pushd ${SRCLIB}/wasi-sdk
     git submodule update --init --depth=1
     popd
 
     # Fenix
-    git clone --depth=1 --branch ${Fenix_tag} https://github.com/mozilla-mobile/firefox-android ${workdir}/fenix
-    pushd ${workdir}/fenix
+    git clone --depth=1 --branch ${Fenix_tag} https://github.com/mozilla-mobile/firefox-android ${WORK_DIR}/fenix
+    pushd ${WORK_DIR}/fenix
     sed -i -e '/com.google.firebase/d' android-components/plugins/dependencies/src/main/java/DependenciesPlugin.kt || sed -i -e '/com.google.firebase/d' android-components/buildSrc/src/main/java/Dependencies.kt
     rm -R android-components/components/lib/push-firebase
     popd
 
-    find ${workdir}/ -name gradle.properties -exec sed -i  \
+    find ${WORK_DIR}/ -name gradle.properties -exec sed -i  \
                                                     -e 's/org.gradle.daemon=true/org.gradle.daemon=false/g' \
                                                     -e 's/org.gradle.parallel=false/org.gradle.parallel=true/g' \
                                                     -e 's/org.gradle.configureondemand=false/org.gradle.configureondemand=true/g' \
                                                     {} \;
 
-    cd ${workdir}/fenix
-    ${srclib}/MozBuild/prebuild.sh ${Fenix_version} ${Fenix_code}
-    find ${srclib}/MozBuild -name .git -exec rm -rf {} \;
-    find ${srclib}/MozAppServices -name .git -exec rm -rf {} \;
-    find ${srclib}/MozGlean -name .git -exec rm -rf {} \;
-    find ${srclib}/MozGleanAS -name .git -exec rm -rf {} \;
-    find ${srclib}/rustup -name .git -exec rm -rf {} \;
-    find ${srclib}/wasi-sdk -name .git -exec rm -rf {} \;
+    cd ${WORK_DIR}/fenix
+    ${SRCLIB}/MozBuild/prebuild.sh ${Fenix_version} ${Fenix_code}
+    find ${SRCLIB}/MozBuild -name .git -exec rm -rf {} \;
+    find ${SRCLIB}/MozAppServices -name .git -exec rm -rf {} \;
+    find ${SRCLIB}/MozGlean -name .git -exec rm -rf {} \;
+    find ${SRCLIB}/MozGleanAS -name .git -exec rm -rf {} \;
+    find ${SRCLIB}/rustup -name .git -exec rm -rf {} \;
+    find ${SRCLIB}/wasi-sdk -name .git -exec rm -rf {} \;
 fi
 
 if [[ ${BUILD} -eq 1 ]]; then
-    cd ${workdir}/fenix
-    ${srclib}/MozBuild/build.sh
+    cd ${WORK_DIR}/fenix
+    ${SRCLIB}/MozBuild/build.sh
 
     gradle --stop
-    cp ${workdir}/fenix/app/build/outputs/apk/release/*.apk /tmp/
+    cp ${WORK_DIR}/fenix/app/build/outputs/apk/release/*.apk /tmp/
 fi
