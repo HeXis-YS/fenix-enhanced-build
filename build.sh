@@ -148,7 +148,7 @@ if [[ ${BUILD_DEP} -eq 1 ]]; then
         pushd "${ANDROID_SDK}/ndk/${ndk}/toolchains/llvm/prebuilt/linux-x86_64"
         xargs -a "${REPO_DIR}/filelist/${ndk}.txt" -I{} rm -f "{}"
         find . -type d -empty -delete
-        rsync -a "${WORK_DIR}/llvm-prebuilts/clang-r475365b/" ./
+        rsync -a --link-dest="${WORK_DIR}/llvm-prebuilts/clang-r475365b/" "${WORK_DIR}/llvm-prebuilts/clang-r475365b/" ./
 
         pushd bin
         sed -i -e "s|/clang|/wrapper/clang|g" *-linux-android*-clang*
