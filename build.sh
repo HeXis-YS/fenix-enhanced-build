@@ -143,22 +143,23 @@ if [[ ${BUILD_DEP} -eq 1 ]]; then
     ln -s r25c 25.2.9519653
     popd
 
-    git clone -b ndk-r26-release --depth=1 https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86 "${WORK_DIR}/llvm-prebuilts"
+    NDK_TOOLCHAIN_BRANCH=ndk-r26-release
+    NDK_TOOLCHAIN_VERSION=clang-r475365b
+    git clone -b ${NDK_TOOLCHAIN_BRANCH} --depth=1 https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86 "${WORK_DIR}/llvm-prebuilts"
+    pushd  "${WORK_DIR}/llvm-prebuilts/${NDK_TOOLCHAIN_VERSION}/bin"
+    mkdir -p wrapper
+    for file in "clang" "clang++"; do
+        cp "${REPO_DIR}/ndk-wrapper.sh" wrapper/${file}
+        sed -i -e "s|@COMPILER_EXE@|${file}|g" -e "s|@OVERWRITE_CFLAGS@|${OVERWRITE_CFLAGS}|g" wrapper/${file}
+    done
+    chmod 755 wrapper/*
+    popd
     for ndk in "r21d" "r25" "r25b" "r25c"; do
         pushd "${ANDROID_SDK}/ndk/${ndk}/toolchains/llvm/prebuilt/linux-x86_64"
         xargs -a "${REPO_DIR}/filelist/${ndk}.txt" -I{} rm -f "{}"
         find . -type d -empty -delete
-        rsync -a --link-dest="${WORK_DIR}/llvm-prebuilts/clang-r475365b/" "${WORK_DIR}/llvm-prebuilts/clang-r475365b/" ./
-
-        pushd bin
-        sed -i -e "s|/clang|/wrapper/clang|g" *-linux-android*-clang*
-        mkdir -p wrapper
-        for file in "clang" "clang++"; do
-            cp "${REPO_DIR}/ndk-wrapper.sh" wrapper/${file}
-            sed -i -e "s|@COMPILER_EXE@|${file}|g" -e "s|@OVERWRITE_CFLAGS@|${OVERWRITE_CFLAGS}|g" wrapper/${file}
-        done
-        chmod 755 wrapper/*
-        popd
+        sed -i -e "s|/clang|/wrapper/clang|g" bin/*-linux-android*-clang*
+        rsync -a --link-dest="${WORK_DIR}/llvm-prebuilts/${NDK_TOOLCHAIN_VERSION}/" "${WORK_DIR}/llvm-prebuilts/${NDK_TOOLCHAIN_VERSION}/" ./
         popd
     done
     rm -rf "${WORK_DIR}/llvm-prebuilts"
